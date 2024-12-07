@@ -16,6 +16,9 @@ class SFHomePage{
         this.tableLocator = "//table[contains(@class,'slds-table')]";
         this.tableRows = "tbody tr";
         this.accountNameLink = "th span a";
+        this.accountListViewLabel = 'Accounts||List View';
+        this.contactDetails = "(//a[text()='Contact Details'])[2]";
+        this.accountName = "[data-field-id='RecordNameField'] div dd lightning-formatted-text";
     }
 
     async gotoHome(){
@@ -55,9 +58,11 @@ class SFHomePage{
         await table.waitFor({ state: 'visible' });
         const rows = table.locator(this.tableRows);
         console.log("No. of rows: ", await rows.count());
-        const matchedAccount = await rows.filter({
-            has: await this.page.locator(this.accountNameLink).locator(`text=${accountName}`)
-        });
-        await matchedAccount.first().click();
+        // const matchedAccount = await rows.filter({
+        //     has: await this.page.locator(this.accountNameLink),
+        //     hasText: accountName
+        // });
+        // await matchedAccount.first().click();
+        await this.page.getByLabel(this.accountListViewLabel).locator('span').filter({ hasText: accountName }).first().click();
     }
 }
