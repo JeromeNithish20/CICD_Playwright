@@ -22,10 +22,10 @@ test('Login As Supplier', async ({ page }) => {
   await page.locator("//span[normalize-space()='Contacts']").click()
 
   await page.locator("a[title='Akhil NPC']").click()
-  const [page1] = await Promise.all([
-    page.waitForEvent('popup'),
-    page.locator("//button[@name='LoginToNetworkAsUser']").click()
-  ]);
+  // const [page1] = await Promise.all([
+  //   page.waitForEvent('popup'),
+   await page.locator("//button[@name='LoginToNetworkAsUser']").click()
+  // ]);
 
   await page1.waitForTimeout(10000)
   await page1.locator("//li[.//span[text()='Range Review Calendar (CDS)']]").click();

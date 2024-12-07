@@ -16,5 +16,6 @@ class LoginPage{
         await this.page.fill(this.passwordInput, password);
         await this.page.click(this.loginButton);
         await this.page.click(this.agreeButton);
+        await this.page.waitForLoadState('load');
     }
 }
