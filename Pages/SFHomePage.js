@@ -53,7 +53,6 @@ class SFHomePage{
         await this.page.click(this.accountResultTab);
     }
     async clickOnAccount(accountName){
-        // await this.page.locator(this.tableLocator).waitFor({ state: 'visible' });
         const table = await this.page.locator(this.tableLocator);
         await table.waitFor({ state: 'visible' });
         const rows = table.locator(this.tableRows);

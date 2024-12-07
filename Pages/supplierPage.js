@@ -9,6 +9,7 @@ export class supplierPage{
         this.lookupButton = "button:has-text('Lookup')";
         this.tradeDetailsText = "h6:has-text('Trade Partner Details')";
         this.entityNameDropdown = "(//Select[@class='slds-select'])[4]";
+        this.entityNameDropdownOption = "((//select[@class='slds-select'])[4])//option[2]";
         this.tradingNameDropdown = "(//Select[@class='slds-select'])[5]";
         this.tradingNameInput = "input[placeholder$='Trading Name']";
         this.nextButton = "button:has-text('Next')";
@@ -58,6 +59,8 @@ export class supplierPage{
     async selectEntityName(){
         await this.page.waitForSelector(this.entityNameDropdown, { visible: true });
         await this.page.locator(this.entityNameDropdown).selectOption({index: 1});
+        const entityNameDropdownValue = await this.page.locator(this.entityNameDropdownOption).textContent();
+        return entityNameDropdownValue;
     }
     async selectCompanyTradingName(){
         await this.page.waitForSelector(this.tradingNameDropdown, { visible: true });
