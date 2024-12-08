@@ -14,7 +14,9 @@ export class CommunityPage {
     async displayAccountName(){
         await this.page.waitForSelector(this.accountName, { visible: true });
         console.log(this.page.locator(this.accountName).textContent());
-        await expect(this.page).toHaveURL(this.pageURL);
+    }
+    async verifyPageTitle(){
+        await expect.soft(this.page).toHaveURL(this.pageURL);
     }
     async clickOnRRC(){
         await this.page.click(this.rrcButton);

@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
-export class supplierPage{
-    constructor(page){
+import { stat } from 'fs';
+export class supplierPage {
+    constructor(page) {
         this.page = page;
         //First Page
         this.pageUrl = 'https://woolworths--phuat.sandbox.my.site.com/s/';
@@ -13,6 +14,7 @@ export class supplierPage{
         this.tradingNameDropdown = "(//Select[@class='slds-select'])[5]";
         this.tradingNameInput = "input[placeholder$='Trading Name']";
         this.nextButton = "button:has-text('Next')";
+        this.warningMessage = "//div[contains(text(),'Your company')]";
         //Second Page
         this.countryDropdown = "(//input[@class='slds-input slds-combobox__input'])[1]";
         this.countryOption = "span[title='Australia']";
@@ -32,99 +34,118 @@ export class supplierPage{
         this.termsCheckbox = "(//*[@class='slds-checkbox_faux'])[2]";
         this.declarationCheckbox = "(//*[@class='slds-checkbox_faux'])[3]";
         this.captchaFrame = "//iframe[@title='reCAPTCHA']";
-        this.captchaCheckbox = "#recaptcha-anchor";   
+        this.captchaCheckbox = "#recaptcha-anchor";
         this.submitButton = "button:has-text('Submit')";
         //Final Page
         this.successMessage = "//h5[contains(@class,'slds-text')]";
     }
-    async gotoSupplierPage(){
+    async gotoSupplierPage() {
         await this.page.goto(this.pageUrl);
     }
-    async clickOnStartApplication(){
+    async clickOnStartApplication() {
         await this.page.click(this.startApplicationButton);
         await this.page.waitForLoadState('load');
     }
-    async verifyPageTitle(pageName){
-        const pageTitle =await this.page.title();
+    async verifyPageTitle(pageName) {
+        const pageTitle = await this.page.title();
         expect(pageTitle).toBe(pageName);
     }
-    async enterAbn(abn){
+    async enterAbn(abn) {
         // expect(this.page.title()).toHaveTitle('Supplier Onboarding');
         await this.page.fill(this.abnInput, abn);
-    }   
-    async clickOnLookup(){
+    }
+    async clickOnLookup() {
         await this.page.click(this.lookupButton);
     }
+    async checkWarningMessage() {
+        try {
+            await this.page.waitForSelector(this.warningMessage, { state: 'visible', timeout: 5000 });
+            return true;
+        } catch (error) {
+            return false;
+        }
+        // if (await this.page.isVisible(this.warningMessage)){
+        //     return true;
+        // }
+        // else{
+        //     return false;
+        // }
+    }
+    async getWarningMessage() {
+        await this.page.waitForSelector(this.warningMessage, { visible: true });
+        const warningMessage = await this.page.locator(this.warningMessage).textContent();
+        return warningMessage;
+    }
 
-    async selectEntityName(){
+    async selectEntityName() {
         await this.page.waitForSelector(this.entityNameDropdown, { visible: true });
-        await this.page.locator(this.entityNameDropdown).selectOption({index: 1});
+        await this.page.locator(this.entityNameDropdown).selectOption({ index: 1 });
         const entityNameDropdownValue = await this.page.locator(this.entityNameDropdownOption).textContent();
         return entityNameDropdownValue;
     }
-    async selectCompanyTradingName(){
+    async selectCompanyTradingName() {
         await this.page.waitForSelector(this.tradingNameDropdown, { visible: true });
-        await this.page.locator(this.tradingNameDropdown).selectOption({value: 'Other'});
+        await this.page.locator(this.tradingNameDropdown).selectOption({ value: 'Other' });
     }
-    async enterTradingName(tradingName){
+    async enterTradingName(tradingName) {
         await this.page.waitForSelector(this.tradingNameInput, { visible: true });
         await this.page.fill(this.tradingNameInput, tradingName);
     }
-    async clickOnNext(){
+    async clickOnNext() {
         await this.page.waitForSelector(this.nextButton, { visible: true });
         await this.page.click(this.nextButton);
     }
-    async selectCountry(country){
+    async selectCountry(country) {
         await this.page.waitForSelector(this.countryDropdown, { visible: true });
         await this.page.type(this.countryDropdown, country);
         await this.page.waitForSelector(this.countryOption, { visible: true });
         await this.page.click(this.countryOption);
     }
-    async enterStreet(street){
+    async enterStreet(street) {
         await this.page.waitForSelector(this.streetInput, { visible: true });
         await this.page.fill(this.streetInput, street);
     }
-    async enterTown(town){
+    async enterTown(town) {
         await this.page.waitForSelector(this.townInput, { visible: true });
         await this.page.fill(this.townInput, town);
     }
-    async selectState(){
+    async selectState() {
         await this.page.waitForSelector(this.stateDropdown, { visible: true });
-        await this.page.locator(this.stateDropdown).selectOption({index: 2});
+        await this.page.locator(this.stateDropdown).selectOption({ index: 2 });
     }
-    async enterPostcode(postcode){
+    async enterPostcode(postcode) {
         await this.page.waitForSelector(this.postcodeInput, { visible: true });
         await this.page.fill(this.postcodeInput, postcode);
     }
-    async clickOnCheckbox(){
+    async clickOnCheckbox() {
         await this.page.click(this.copyCheckbox);
     }
-    async fillContactDetails(firstName, lastName, jobTitle, email, contactNumber){
+    async fillContactDetails(firstName, lastName, jobTitle, email, contactNumber) {
         await this.page.waitForSelector(this.titleDropdown, { visible: true });
-        await this.page.locator(this.titleDropdown).selectOption({index: 1});
+        await this.page.locator(this.titleDropdown).selectOption({ index: 1 });
         await this.page.fill(this.firstNameInput, firstName);
         await this.page.fill(this.lastNameInput, lastName);
         await this.page.fill(this.jobTitleInput, jobTitle);
         await this.page.fill(this.emailInput, email);
-        await this.page.locator(this.countryCodeDropdown).selectOption({value: 'Australia (+61)'});
+        await this.page.locator(this.countryCodeDropdown).selectOption({ value: 'Australia (+61)' });
         await this.page.fill(this.contactNumberInput, contactNumber);
     }
-    async acceptTermsAndConditions(){
+    async acceptTermsAndConditions() {
         await this.page.waitForSelector(this.termsCheckbox, { visible: true });
         await this.page.click(this.termsCheckbox);
         await this.page.click(this.declarationCheckbox);
-    
+
     }
-    async clickOnSubmit(){
+    async clickOnSubmit() {
         await this.page.waitForSelector(this.submitButton, { visible: true });
         await this.page.click(this.submitButton);
     }
-    async verifySuccessMessage(){
+    async verifySuccessMessage() {
         await this.page.waitForSelector(this.successMessage, { visible: true });
         const successMessage = await this.page.textContent(this.successMessage);
         console.log(successMessage);
         expect(successMessage)
-        .toContain('Your registration with Partner Hub is successful. Please check your email for the login details.');
-        
+            .toContain('Your registration with Partner Hub is successful. Please check your email for the login details.');
+
     }
 }

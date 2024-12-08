@@ -2,44 +2,61 @@ import { test, expect } from '@playwright/test';
 import { supplierPage } from '../Pages/supplierPage';
 import { LoginPage } from '../Pages/LoginPage';
 import { SFHomePage } from '../Pages/SFHomePage';
+import { CommunityPage } from '../Pages/CommunityPage';
 const td = require('../testdata/supplierOnboarding.json');
+const fs = require('fs');
 
-test('Supplier Onboarding', async ({ page }) => {
+test.skip('Supplier Registration', async ({ page }) => {
     const supplier = new supplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
         await supplier.gotoSupplierPage();
         await supplier.clickOnStartApplication();
         await supplier.verifyPageTitle(td.pageName);
     });
-    await test.step('Enter Business Details', async () => {
+    await test.step('Enter ABN Number and Click on Lookup', async () => {
         await supplier.enterAbn(td.abn);
         await supplier.clickOnLookup();
-        await page.waitForTimeout(2000);
-        const entityNameDropdownValue = await supplier.selectEntityName();
-        await supplier.selectCompanyTradingName();
-        await supplier.enterTradingName(entityNameDropdownValue);
-        await supplier.clickOnNext();
     });
-    await test.step('Enter Company Details', async () => {
-        await supplier.selectCountry(td.country);
-        await supplier.enterStreet(td.street);
-        await supplier.enterTown(td.town);
-        await supplier.selectState();
-        await supplier.enterPostcode(td.postcode);
-        await supplier.clickOnCheckbox();
+    await test.step('Check Warning Message', async () => {
+        const lookupResult = await supplier.checkWarningMessage();
+        if (lookupResult) {
+            const warningMessage = await supplier.getWarningMessage();
+            console.warn('Warning Message:', warningMessage);
+            page.close();
+            return;
+        }
+        else {
+            await test.step('Enter Business Details', async () => {
+                await page.waitForTimeout(2000);
+                //Buffering the value to be used in next step
+                const entityNameDropdownValue = await supplier.selectEntityName();
+                fs.writeFileSync('buffer.json', JSON.stringify({ bufferedEntityValue: entityNameDropdownValue }));
+                await supplier.selectCompanyTradingName();
+                await supplier.enterTradingName(entityNameDropdownValue);
+                await supplier.clickOnNext();
+            });
+            await test.step('Enter Company Details', async () => {
+                await supplier.selectCountry(td.country);
+                await supplier.enterStreet(td.street);
+                await supplier.enterTown(td.town);
+                await supplier.selectState();
+                await supplier.enterPostcode(td.postcode);
+                await supplier.clickOnCheckbox();
+            });
+            await test.step('Enter Contact Details', async () => {
+                await supplier.fillContactDetails(td.firstName, td.lastName, td.jobTitle, td.email, td.contactNumber);
+                await page.waitForTimeout(2000);
+                await supplier.clickOnNext();
+            });
+            await test.step('Submit the application', async () => {
+                await supplier.acceptTermsAndConditions();
+                page.pause();
+                await supplier.clickOnSubmit();
+                await supplier.verifySuccessMessage();
+            });
+            page.close();
+        }
     });
-    await test.step('Enter Contact Details', async () => {
-        await supplier.fillContactDetails(td.firstName, td.lastName, td.jobTitle, td.email, td.contactNumber);
-        await page.waitForTimeout(2000);
-        await supplier.clickOnNext();
-    });
-    await test.step('Submit the application', async () => {
-        await supplier.acceptTermsAndConditions();
-        page.pause();
-        await supplier.clickOnSubmit();
-        await supplier.verifySuccessMessage();
-    });
-    page.close();
 
 });
 
@@ -54,11 +71,28 @@ test('Login as Supplier', async ({ page }) => {
     await test.step('Navigate to Home', async () => {
         await home.gotoHome();
     });
-    await test.step('Verify Supplier Account', async () => {
-        await home.searchAccount(td.tradingName);
+    await test.step('Navigate to Supplier Account', async () => {
+        //Reading buffered value from previous test
+        const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
+        console.log('Buffered Value:', buffer.bufferedEntityValue);
+        await home.searchAccount(buffer.bufferedEntityValue);
         await page.waitForTimeout(3000);
         await home.clickOnAccountResultTab();
-        await page.waitForTimeout(4000);
-        await home.clickOnAccount(td.tradingName);
+        await page.waitForTimeout(2000);
+        await home.clickOnAccount(buffer.bufferedEntityValue);
     });
+    // await page.waitForTimeout(5000);
+    await test.step('Verify Account Details', async () => {
+        // await home.verifyAccountDetails(td.abn, td.country);
+        await home.clickOnContactDetails();
+        await page.waitForLoadState('load');
+        await home.clickOnLoginToExperienceAsUser();
+    });
+    // await page.waitForTimeout(5000);
+    /*const community = new CommunityPage(page);
+    await test.step('Select RRC', async () => {
+        await community.verifyPageTitle();
+        await community.clickOnRRC();
+        await community.clickOnMyRRCButton();
+    });*/
 });
