@@ -140,12 +140,12 @@ export class supplierPage {
         await this.page.waitForSelector(this.submitButton, { visible: true });
         await this.page.click(this.submitButton);
     }
-    async verifySuccessMessage() {
+    async verifySuccessMessage(expected_successMessage) {
         await this.page.waitForSelector(this.successMessage, { visible: true });
         const successMessage = await this.page.textContent(this.successMessage);
         console.log(successMessage);
         expect(successMessage)
-            .toContain('Your registration with Partner Hub is successful. Please check your email for the login details.');
+            .toContain(expected_successMessage);
 
     }
 }

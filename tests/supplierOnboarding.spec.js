@@ -5,8 +5,9 @@ import { SFHomePage } from '../Pages/SFHomePage';
 import { CommunityPage } from '../Pages/CommunityPage';
 const td = require('../testdata/supplierOnboarding.json');
 const fs = require('fs');
+test.setTimeout(60000);
 
-test.skip('Supplier Registration', async ({ page }) => {
+test('Supplier Registration', async ({ page }) => {
     const supplier = new supplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
         await supplier.gotoSupplierPage();
@@ -30,7 +31,9 @@ test.skip('Supplier Registration', async ({ page }) => {
                 await page.waitForTimeout(2000);
                 //Buffering the value to be used in next step
                 const entityNameDropdownValue = await supplier.selectEntityName();
-                fs.writeFileSync('buffer.json', JSON.stringify({ bufferedEntityValue: entityNameDropdownValue }));
+                const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
+                buffer.bufferedEntityValue = entityNameDropdownValue;
+                fs.writeFileSync('buffer.json', JSON.stringify(buffer));
                 await supplier.selectCompanyTradingName();
                 await supplier.enterTradingName(entityNameDropdownValue);
                 await supplier.clickOnNext();
@@ -52,7 +55,7 @@ test.skip('Supplier Registration', async ({ page }) => {
                 await supplier.acceptTermsAndConditions();
                 page.pause();
                 await supplier.clickOnSubmit();
-                await supplier.verifySuccessMessage();
+                await supplier.verifySuccessMessage(td.expected_successMessage);
             });
             page.close();
         }
@@ -74,25 +77,38 @@ test('Login as Supplier', async ({ page }) => {
     await test.step('Navigate to Supplier Account', async () => {
         //Reading buffered value from previous test
         const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
-        console.log('Buffered Value:', buffer.bufferedEntityValue);
+        // console.log('Buffered Value:', buffer.bufferedEntityValue);
         await home.searchAccount(buffer.bufferedEntityValue);
-        await page.waitForTimeout(3000);
+        // await page.waitForTimeout(3000);
         await home.clickOnAccountResultTab();
-        await page.waitForTimeout(2000);
+        // await page.waitForTimeout(2000);
         await home.clickOnAccount(buffer.bufferedEntityValue);
     });
-    // await page.waitForTimeout(5000);
     await test.step('Verify Account Details', async () => {
         // await home.verifyAccountDetails(td.abn, td.country);
         await home.clickOnContactDetails();
         await page.waitForLoadState('load');
         await home.clickOnLoginToExperienceAsUser();
     });
-    // await page.waitForTimeout(5000);
-    /*const community = new CommunityPage(page);
-    await test.step('Select RRC', async () => {
+    // await page.waitForTimeout(8000);
+    const community = new CommunityPage(page);
+    await test.step('Check Welcome Popup', async () => {
+        community.closeWelcomePopup();
+    });
+    await test.step('Buffer New Supplier Case Number', async () => {
+        await community.closeWelcomePopup();
         await community.verifyPageTitle();
+        // await community.displayAccountName();
+        await community.clickOnCases();
+        await community.changeListView();
+        const supplierCaseNo = await community.bufferSupplierCaseNumber();
+        const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
+        buffer.bufferedSupplierCaseNo = supplierCaseNo;
+        fs.writeFileSync('buffer.json', JSON.stringify(buffer));
+    });
+
+    /* await test.step('Select RRC', async () => {
         await community.clickOnRRC();
         await community.clickOnMyRRCButton();
-    });*/
+    }); */
 });

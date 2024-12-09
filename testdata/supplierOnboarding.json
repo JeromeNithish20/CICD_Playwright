@@ -1,6 +1,6 @@
 {
     "pageName": "Supplier Onboarding",
-    "abn": "20661782038",
+    "abn": "51138398150",
     "tradingName": "The Sorbent Paper Co",
     "country": "Australia",
     "street": "1 Woolworths Way",
@@ -9,8 +9,9 @@
     "firstName": "John",
     "lastName": "Doe",
     "jobTitle": "Manager",
-    "email": "jnithishi+test2@tcs.woolworths.com.au",
+    "email": "jnithishi+test5@tcs.woolworths.com.au",
     "contactNumber": "0412345678",
+    "expected_successMessage": "Your registration with Partner Hub is successful. Please check your email for the login details.",
     "username": "jn@tcs.woolworths.com.au.phuat",
     "password": "Tcs@1234"
 }
