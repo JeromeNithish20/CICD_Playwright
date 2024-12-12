@@ -63,7 +63,7 @@ test('Supplier Registration', async ({ page }) => {
 
 });
 
-test('Login as Supplier', async ({ page }) => {
+test.only('Login as Supplier', async ({ page }) => {
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
         await login.gotoLoginPage();
@@ -77,11 +77,8 @@ test('Login as Supplier', async ({ page }) => {
     await test.step('Navigate to Supplier Account', async () => {
         //Reading buffered value from previous test
         const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
-        // console.log('Buffered Value:', buffer.bufferedEntityValue);
         await home.searchAccount(buffer.bufferedEntityValue);
-        // await page.waitForTimeout(3000);
         await home.clickOnAccountResultTab();
-        // await page.waitForTimeout(2000);
         await home.clickOnAccount(buffer.bufferedEntityValue);
     });
     await test.step('Verify Account Details', async () => {
@@ -90,13 +87,9 @@ test('Login as Supplier', async ({ page }) => {
         await page.waitForLoadState('load');
         await home.clickOnLoginToExperienceAsUser();
     });
-    // await page.waitForTimeout(8000);
     const community = new CommunityPage(page);
-    await test.step('Check Welcome Popup', async () => {
-        community.closeWelcomePopup();
-    });
     await test.step('Buffer New Supplier Case Number', async () => {
-        await community.closeWelcomePopup();
+        await page.waitForLoadState('load');
         await community.verifyPageTitle();
         // await community.displayAccountName();
         await community.clickOnCases();
@@ -107,8 +100,10 @@ test('Login as Supplier', async ({ page }) => {
         fs.writeFileSync('buffer.json', JSON.stringify(buffer));
     });
 
-    /* await test.step('Select RRC', async () => {
+    await test.step('Select RRC', async () => {
         await community.clickOnRRC();
-        await community.clickOnMyRRCButton();
-    }); */
+        await community.selectDivision(td.division);
+        await community.selectTradingDept(td.tradingDept);
+        // await community.selectSubcategory(td.subcategory);
+    });
 });

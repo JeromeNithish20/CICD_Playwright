@@ -16,7 +16,7 @@ exports.SFHomePage =
             //Search Results
             this.contactResultTab = "//span[normalize-space()='Contacts']";
             this.accountResultTab = "//span[normalize-space()='Accounts']";
-            this.tableLocator = "//table[contains(@class,'slds-table')]";
+            this.tableLocator = "(//table[contains(@class,'slds-table')])[3]";
             this.tableRows = "tbody tr";
             this.accountNameLink = "th span a";
             this.accountListViewLabel = 'Accounts||List View';
