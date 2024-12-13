@@ -5,6 +5,7 @@ exports.SFHomePage =
         constructor(page) {
 
             this.page = page;
+            this.selectedMenu = "//a[@title='Home']";
             this.navMenu = 'button[title="Show Navigation Menu"]';
             this.homeMenu = '//ul[@role="menu"]//span[text()="Home"]';
             //Gloabl Search
@@ -29,7 +30,7 @@ exports.SFHomePage =
         }
 
         async gotoHome() {
-            if (!(this.page.locator(this.navMenu).isVisible())) {
+            if (!(await this.page.locator(this.selectedMenu).isVisible())) {
                 await this.page.locator(this.navMenu).waitFor({ state: 'visible' });
                 await this.page.click(this.navMenu);
                 await this.page.locator(this.homeMenu).waitFor({ state: 'visible' });
@@ -59,8 +60,6 @@ exports.SFHomePage =
             await this.page.click(this.accountResultTab);
         }
         async clickOnAccount(accountName) {
-            const table = await this.page.locator(this.tableLocator);
-            await table.waitFor({ state: 'visible' });
             await this.page.getByRole('link', { name: accountName }).waitFor({ state: 'visible' });
             await this.page.getByRole('link', { name: accountName }).click();
         }

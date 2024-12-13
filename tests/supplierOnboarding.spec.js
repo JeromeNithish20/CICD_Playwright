@@ -3,6 +3,7 @@ import { supplierPage } from '../Pages/supplierPage';
 import { LoginPage } from '../Pages/LoginPage';
 import { SFHomePage } from '../Pages/SFHomePage';
 import { CommunityPage } from '../Pages/CommunityPage';
+import { RangeReviewFlow } from '../Pages/RangeReviewFlow';
 const td = require('../testdata/supplierOnboarding.json');
 const fs = require('fs');
 test.setTimeout(60000);
@@ -88,22 +89,36 @@ test.only('Login as Supplier', async ({ page }) => {
         await home.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
-    await test.step('Buffer New Supplier Case Number', async () => {
+    /* await test.step('Buffer New Supplier Case Number', async () => {
         await page.waitForLoadState('load');
         await community.verifyPageTitle();
         // await community.displayAccountName();
         await community.clickOnCases();
-        await community.changeListView();
+        await community.changeCaseListView();
         const supplierCaseNo = await community.bufferSupplierCaseNumber();
         const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
         buffer.bufferedSupplierCaseNo = supplierCaseNo;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer));
-    });
+    }); */
 
     await test.step('Select RRC', async () => {
         await community.clickOnRRC();
-        await community.selectDivision(td.division);
-        await community.selectTradingDept(td.tradingDept);
+        // await community.selectDivision(td.division);
+        // await community.selectTradingDept(td.tradingDept);
         // await community.selectSubcategory(td.subcategory);
+        await community.changeRRCListView();
+        await page.waitForTimeout(2000);
+        await community.searchRRCList(td.RRCName);
+        await community.clickOnRangeReviewName();
+        await community.clickOnAddArticle();
+        // page.close();
+    });
+    const rrc = new RangeReviewFlow(page);
+    await test.step('Range Review Flow', async () => {
+        await test.step('Enter GTIN', async () => {
+            await page.waitForLoadState('load');
+            await rrc.enterGTIN();
+        });
+
     });
 });
