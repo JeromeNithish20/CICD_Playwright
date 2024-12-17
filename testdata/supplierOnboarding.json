@@ -1,4 +1,7 @@
 {
+    "username": "jn@tcs.woolworths.com.au.phuat",
+    "password": "Tcs@1234",
+
     "pageName": "Supplier Onboarding",
     "abn": "40683201002",
     "tradingName": "The Sorbent Paper Co",
@@ -12,10 +15,22 @@
     "email": "jnithishi+test5@tcs.woolworths.com.au",
     "contactNumber": "0412345678",
     "expected_successMessage": "Your registration with Partner Hub is successful. Please check your email for the login details.",
-    "username": "jn@tcs.woolworths.com.au.phuat",
-    "password": "Tcs@1234",
+    
     "division": "1005",
     "tradingDept": "GROCERIES",
     "subcategory": "ASIAN FOODS",
-    "RRCName": "ASIAN FOODS"
+    "RRCName": "ASIAN FOODS",
+
+    "articleType": "Food & Drinks",
+    "articleClass": "Packaged Good",
+    "articleCategory": "00",
+    "isHumanForConsumption": "Yes",
+    "isThirdParty": "No",
+    "productName": "Test Article",
+    "minShelfLife": "25",
+    "maxShelfLife": "75",
+    "unitsSoldPerStore": "100",
+    "storesRanged": "100",
+    "distributionMethod": "DSD"
+
 }

@@ -15,8 +15,7 @@ export class CommunityPage {
         this.allOpenCasesOption = "//mark[text()='All Open Cases']";
         this.caseNumber = "table tbody tr th a";
         this.rrcButton = " //span[text()='Range Review Calendar (CDS)']";
-        this.rrcPopup = "locator('#walkme-visual-design-73ba664a-ccd1-6111-15bd-c43c69ce5ae6')";//button[text()='How to Submit a New Product']";
-        this.rrcPopupClose = "locator('#container-d14afb67-5378-6828-2c7d-f55ac5cbbf04 div').nth(1)";//button[@class="wm-visual-design-button"]/div';
+        this.exitPopup = "(//div/p/a/u)[2]"
         this.divisionDropdown = "//select[@class='slds-select']";
         this.tradingDeptDropdown = "(//input[@placeholder='Select an Option'])[1]";
         this.subcategoryDropdown = "(//input[@placeholder='Select an Option'])[2]";
@@ -76,9 +75,9 @@ export class CommunityPage {
         try {
             //Checking if the popup is visible and closing it
             const popupSelector = this.page.locator(this.rrcPopup);
-            await this.page.waitForSelector(popupSelector, {state: 'visible', timeout: 15000});
+            await this.page.waitForSelector(popupSelector, { state: 'visible', timeout: 15000 });
             console.log('Popup appeared');
-            await this.page.click(this.rrcPopupClose); 
+            await this.page.click(this.rrcPopupClose);
         } catch (e) {
             console.log('RRC Popup did not appear within the timeout');
             await this.page.waitForSelector(this.divisionDropdown, { state: 'visible' });
@@ -100,10 +99,11 @@ export class CommunityPage {
         await this.page.getByPlaceholder('Search', { exact: true }).waitFor({ state: 'visible' });
         await this.page.getByPlaceholder('Search', { exact: true }).click();
         await this.page.getByPlaceholder('Search', { exact: true }).fill(subcategory);
-        await this.page.waitForSelector("span[title='${subcategory}']", { state: 'visible' }); 
+        await this.page.waitForSelector("span[title='${subcategory}']", { state: 'visible' });
         await this.page.click("span[title='${subcategory}']");
     }
     async changeRRCListView() {
+        await this.page.click(this.exitPopup);
         await this.page.waitForSelector(this.RRCListViewDropdown, { state: 'visible' });
         await this.page.click(this.RRCListViewDropdown);
         await this.page.waitForSelector(this.searchRRCListInput, { state: 'visible' });
@@ -111,7 +111,7 @@ export class CommunityPage {
         await this.page.waitForSelector(this.allAciveRRCOption, { state: 'visible' });
         await this.page.click(this.allAciveRRCOption);
     }
-    async searchRRCList(RRC){
+    async searchRRCList(RRC) {
         await this.page.waitForSelector(this.searchRRCInput, { state: 'visible' });
         await this.page.fill(this.searchRRCInput, RRC);
         await this.page.locator(this.searchRRCInput).press('Enter');
@@ -121,13 +121,13 @@ export class CommunityPage {
         await this.page.click(this.rangeReviewName);
     }
     async clickOnAddArticle() {
-        console.log('Waiting for Add Article button to be visible');
         await this.page.waitForSelector(this.addArticleButton, { state: 'visible' });
-        console.log('Add Article button is visible, clicking it now');
-        await this.page.click(this.addArticleButton);
-        await this.page.waitForLoadState('load');
-    }
-    async calculateGTIN() {
-
+        const [page1] = await Promise.all([
+            this.page.waitForEvent("popup"),
+            await this.page.click(this.addArticleButton)
+        ]);
+        await page1.waitForLoadState('load');
+        await this.page.close();
+        return page1;
     }
 }

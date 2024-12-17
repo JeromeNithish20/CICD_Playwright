@@ -1,4 +1,4 @@
-function generate12DigitGTIN() {
+export function generate12DigitGTIN() {
     // Start with '98' as the first two digits
     let gtin = '98';
 

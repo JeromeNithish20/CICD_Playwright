@@ -4,9 +4,10 @@ import { LoginPage } from '../Pages/LoginPage';
 import { SFHomePage } from '../Pages/SFHomePage';
 import { CommunityPage } from '../Pages/CommunityPage';
 import { RangeReviewFlow } from '../Pages/RangeReviewFlow';
+import { generate12DigitGTIN } from '../utils/generate12DigitGTIN';
 const td = require('../testdata/supplierOnboarding.json');
 const fs = require('fs');
-test.setTimeout(60000);
+test.setTimeout(80000);
 
 test('Supplier Registration', async ({ page }) => {
     const supplier = new supplierPage(page);
@@ -65,6 +66,7 @@ test('Supplier Registration', async ({ page }) => {
 });
 
 test.only('Login as Supplier', async ({ page }) => {
+    let page1;
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
         await login.gotoLoginPage();
@@ -103,22 +105,31 @@ test.only('Login as Supplier', async ({ page }) => {
 
     await test.step('Select RRC', async () => {
         await community.clickOnRRC();
-        // await community.selectDivision(td.division);
-        // await community.selectTradingDept(td.tradingDept);
-        // await community.selectSubcategory(td.subcategory);
         await community.changeRRCListView();
         await page.waitForTimeout(2000);
         await community.searchRRCList(td.RRCName);
         await community.clickOnRangeReviewName();
-        await community.clickOnAddArticle();
-        // page.close();
+        page1 = await community.clickOnAddArticle();
     });
-    const rrc = new RangeReviewFlow(page);
+    const rrc = new RangeReviewFlow(page1);
     await test.step('Range Review Flow', async () => {
-        await test.step('Enter GTIN', async () => {
-            await page.waitForLoadState('load');
-            await rrc.enterGTIN();
+        await test.step('Product Overview', async () => {
+            const gtin = generate12DigitGTIN(); // Generate GTIN
+            console.log(`Generated GTIN: ${gtin}`);
+            await rrc.enterGTIN(gtin);
+            await rrc.clickOnLookup();
+            await rrc.verifyGTINSuccessMsg();
+            await rrc.selectArticleType(td.articleType);
+            await rrc.selectArticleClass(td.articleClass);
+            await rrc.selectArticleCategory(td.articleCategory);
+            await rrc.selectIsForHumanConsumption(td.isHumanForConsumption);
+            await rrc.selectDataSource(td.isThirdParty);
+            await rrc.clickOnNext();
         });
-
+        await test.step('Product Details', async () => {
+            await rrc.enterProductDescription(td.productName, td.minShefLife, td.maxShefLife);
+            await rrc.enterProductDistribution(td.unitsSoldPerStore, td.storesRanged, td.distributionMethod);
+            await rrc.clickOnNext();
+        });
     });
 });
