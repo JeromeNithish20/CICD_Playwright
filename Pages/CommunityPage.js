@@ -13,7 +13,7 @@ export class CommunityPage {
         this.casesListViewDropdown = "button[title='Select a List View: Cases']";
         this.searchCaseListInput = "input[placeholder='Search lists...']";
         this.allOpenCasesOption = "//mark[text()='All Open Cases']";
-        this.caseNumber = "table tbody tr th a";
+        
         this.rrcButton = " //span[text()='Range Review Calendar (CDS)']";
         this.exitPopup = "(//div/p/a/u)[2]"
         this.divisionDropdown = "//select[@class='slds-select']";
@@ -26,6 +26,9 @@ export class CommunityPage {
         this.searchRRCInput = "//input[@class='slds-input']";
         this.rangeReviewName = "(//tbody/tr/th)[3]/span/a[text()='ASIAN FOODS']";
         this.addArticleButton = "//a[@title='Add Article']";
+
+        this.supplierCaseNumber = "(//table/tbody/tr)[1]/th/span/a";
+        this.articleCaseNumber =  "(//table/tbody/tr)[2]/th/span/a";
 
     }
     async displayAccountName() {
@@ -45,6 +48,7 @@ export class CommunityPage {
             console.log('Popup appeared');
             await this.page.click(this.welcomePopupClose);
         } catch (e) {
+            await this.page.waitForSelector(this.quickLinksTitle, { state: 'visible' });//Need to be commented
             await this.page.click(this.casesButton);
             await this.page.waitForLoadState('load');
         }
@@ -58,11 +62,11 @@ export class CommunityPage {
     }
     async bufferSupplierCaseNumber() {
         await this.page.waitForSelector('table', { state: 'visible' });
-        const supplierCaseNumber = await this.page.locator(this.caseNumber).textContent();
+        const supplierCaseNumber = await this.page.locator(this.supplierCaseNumber).textContent();
         return supplierCaseNumber;
     }
     async clickOnRRC() {
-        await this.page.waitForSelector(this.quickLinksTitle, { state: 'visible' });//Need to be commented
+        // await this.page.waitForSelector(this.quickLinksTitle, { state: 'visible' });//Need to be commented
         await this.page.waitForSelector(this.rrcButton, { visible: true });
         await this.page.click(this.rrcButton);
     }
@@ -129,5 +133,26 @@ export class CommunityPage {
         await page1.waitForLoadState('load');
         await this.page.close();
         return page1;
+    }
+    async bufferArticleCaseNumber(){
+        await this.page.waitForSelector('table', { state: 'visible' });
+        const articleCaseNumber = await this.page.locator(this.articleCaseNumber).textContent();
+        return articleCaseNumber;
+    }
+    async clickOnSupplierCase(bf_supplierCaseNumber) {
+        const supplierCase = await this.page.locator(`//table/tbody/tr/th/span/a[text()="${bf_supplierCaseNumber}"]`);
+        await supplierCase.waitFor({ state: 'visible' });
+        await supplierCase.click();
+        await this.page.waitForSelector('[title="Open Activities"]', { state: 'visible' });
+        await this.page.goBack();
+        await this.page.waitForLoadState('load');
+    }
+    async clickOnArticleCase(bf_articleCaseNumber) {
+        const articleCase = await this.page.locator(`//table/tbody/tr/th/span/a[text()="${bf_articleCaseNumber}"]`);
+        await articleCase.waitFor({ state: 'visible' });
+        await articleCase.click();
+        await this.page.waitForSelector('[title="Open Activities"]', { state: 'visible' });
+        await this.page.goBack();
+        await this.page.waitForLoadState('load');
     }
 }

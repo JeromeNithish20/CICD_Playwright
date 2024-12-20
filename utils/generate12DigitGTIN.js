@@ -22,6 +22,3 @@ export function generate12DigitGTIN() {
     const checkDigit = calculateCheckDigit(gtin);
     return gtin + checkDigit; // Return the complete 12-digit GTIN
 }
-
-// Example usage:
-console.log(generate12DigitGTIN());

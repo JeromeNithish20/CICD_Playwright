@@ -1,9 +1,7 @@
 import { expect } from '@playwright/test';
 exports.SFHomePage =
     class SFHomePage {
-
         constructor(page) {
-
             this.page = page;
             this.selectedMenu = "//a[@title='Home']";
             this.navMenu = 'button[title="Show Navigation Menu"]';

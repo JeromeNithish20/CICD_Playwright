@@ -64,12 +64,6 @@ export class supplierPage {
         } catch (error) {
             return false;
         }
-        // if (await this.page.isVisible(this.warningMessage)){
-        //     return true;
-        // }
-        // else{
-        //     return false;
-        // }
     }
     async getWarningMessage() {
         await this.page.waitForSelector(this.warningMessage, { visible: true });
