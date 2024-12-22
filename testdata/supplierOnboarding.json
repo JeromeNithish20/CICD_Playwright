@@ -12,7 +12,7 @@
     "firstName": "John",
     "lastName": "Doe",
     "jobTitle": "Manager",
-    "email": "jnithishi+test8@tcs.woolworths.com.au",
+    "email": "test@woolworths.com.au.invalid",
     "contactNumber": "0412345678",
     "expected_successMessage": "Your registration with Partner Hub is successful. Please check your email for the login details.",
     
@@ -42,7 +42,20 @@
     "invoiceCost": "11",
     "netCost": "12",
 
-    "RRC_SuccessMessage": "You have successfully submitted an article."
+    "RRC_SuccessMessage": "You have successfully submitted an article.",
 
+    "BSS_UserName": "Sruthi UAT BSS",
+
+    "supplierCaseOwner": "New Suppliers - waiting",
+    "supplierCaseType": "New Supplier Request",
+    "supplierCaseStatus": "Submitted",
+
+    "articleCaseOwner": "Business Support Services",
+    "articleCaseType": "New Article Request",
+    "articleCaseStatus": "Submitted",
+
+    "merchCategory": "118010101",
+    "categoryManager": "Sruthi UAT CM",
+    "categoryAssistant": "Sruthi UAT CA"
 
 }

@@ -1,24 +1,27 @@
 import { test, expect } from '@playwright/test';
-import { supplierPage } from '../Pages/supplierPage';
-import { LoginPage } from '../Pages/LoginPage';
-import { SFHomePage } from '../Pages/SFHomePage';
-import { CommunityPage } from '../Pages/CommunityPage';
-import { RangeReviewFlow } from '../Pages/RangeReviewFlow';
+import { guestSupplierPage } from '../Pages/Supplier/guestSupplierPage';
+import { LoginPage } from '../Pages/Salesforce/LoginPage';
+import { SFHomePage } from '../Pages/Salesforce/SFHomePage';
+import { CommunityPage } from '../Pages/Supplier/CommunityPage';
+import { RangeReviewFlow } from '../Pages/Supplier/RangeReviewFlow';
 import { generate12DigitGTIN } from '../utils/generate12DigitGTIN';
+import { SetupPage } from '../Pages/Salesforce/SetupPage';
+import { SF_Page_InternalUser } from '../Pages/Salesforce/SF_Page_InternalUser';
 const td = require('../testdata/supplierOnboarding.json');
 const fs = require('fs');
+const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
 test.setTimeout(180000);
 
 test.only('Supplier Registration', async ({ page }) => {
-    const supplier = new supplierPage(page);
+    const guest = new guestSupplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
-        await supplier.gotoSupplierPage();
-        await supplier.clickOnStartApplication();
-        await supplier.verifyPageTitle(td.pageName);
+        await guest.gotoSupplierPage();
+        await guest.clickOnStartApplication();
+        await guest.verifyPageTitle(td.pageName);
     });
     await test.step('Enter ABN Number and Click on Lookup', async () => {
-        await supplier.enterAbn(td.abn);
-        await supplier.clickOnLookup();
+        await guest.enterAbn(td.abn);
+        await guest.clickOnLookup();
     });
     await test.step('Check Warning Message', async () => {
         const lookupResult = await supplier.checkWarningMessage();
@@ -33,31 +36,31 @@ test.only('Supplier Registration', async ({ page }) => {
                 await page.waitForTimeout(2000);
                 //Buffering the value to be used in next step
                 const entityNameDropdownValue = await supplier.selectEntityName();
-                const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
+                // const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
                 buffer.bufferedEntityValue = entityNameDropdownValue;
                 fs.writeFileSync('buffer.json', JSON.stringify(buffer));
-                await supplier.selectCompanyTradingName();
-                await supplier.enterTradingName(entityNameDropdownValue);
-                await supplier.clickOnNext();
+                await guest.selectCompanyTradingName();
+                await guest.enterTradingName(entityNameDropdownValue);
+                await guest.clickOnNext();
             });
             await test.step('Enter Company Details', async () => {
-                await supplier.selectCountry(td.country);
-                await supplier.enterStreet(td.street);
-                await supplier.enterTown(td.town);
-                await supplier.selectState();
-                await supplier.enterPostcode(td.postcode);
-                await supplier.clickOnCheckbox();
+                await guest.selectCountry(td.country);
+                await guest.enterStreet(td.street);
+                await guest.enterTown(td.town);
+                await guest.selectState();
+                await guest.enterPostcode(td.postcode);
+                await guest.clickOnCheckbox();
             });
             await test.step('Enter Contact Details', async () => {
-                await supplier.fillContactDetails(td.firstName, td.lastName, td.jobTitle, td.email, td.contactNumber);
+                await guest.fillContactDetails(td.firstName, td.lastName, td.jobTitle, td.email, td.contactNumber);
                 await page.waitForTimeout(2000);
-                await supplier.clickOnNext();
+                await guest.clickOnNext();
             });
             await test.step('Submit the application', async () => {
-                await supplier.acceptTermsAndConditions();
+                await guest.acceptTermsAndConditions();
                 page.pause();
-                await supplier.clickOnSubmit();
-                await supplier.verifySuccessMessage(td.expected_successMessage);
+                await guest.clickOnSubmit();
+                await guest.verifySuccessMessage(td.expected_successMessage);
             });
             page.close();
         }
@@ -65,9 +68,8 @@ test.only('Supplier Registration', async ({ page }) => {
 
 });
 
-test('Login as Supplier and Initiate a RRC', async ({ page }) => {
+test('Login as Supplier and Initiate a New RRC', async ({ page }) => {
     let page1;
-    const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
         await login.gotoLoginPage();
@@ -91,76 +93,113 @@ test('Login as Supplier and Initiate a RRC', async ({ page }) => {
         await home.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
-    /* 
-   await test.step('Select RRC', async () => {
-       await community.clickOnRRC();
-       await community.changeRRCListView();
-       await page.waitForTimeout(2000);
-       await community.searchRRCList(td.RRCName);
-       await community.clickOnRangeReviewName();
-       page1 = await community.clickOnAddArticle();
-   });
-   const rrc = new RangeReviewFlow(page1);
-   await test.step('Range Review Flow', async () => {
-       await test.step('Product Overview', async () => {
-           const gtin = generate12DigitGTIN(); // Generate GTIN
-           console.log(`Generated GTIN: ${gtin}`);
-           await rrc.enterGTIN(gtin);
-           await page1.waitForTimeout(2000);
-           await rrc.clickOnLookup();
-           await rrc.verifyGTINSuccessMsg(td.GTIN_SuccessMessage);
-           await rrc.selectArticleType(td.articleType);
-           await rrc.selectArticleClass(td.articleClass);
-           await rrc.selectArticleCategory(td.articleCategory);
-           await rrc.selectIsForHumanConsumption(td.isHumanForConsumption);
-           await rrc.selectDataSource(td.isThirdParty);
-           await rrc.clickOnNext();
-       });
-       await page1.waitForTimeout(4000);
-       await test.step('Product Details', async () => {
-           await rrc.enterProductDescription(td.productName, td.minShelfLife, td.maxShelfLife);
-           await rrc.enterProductDistribution(td.unitsSoldPerStore, td.storesRanged, td.distributionMethod);
-           await rrc.clickOnNext();
-       });
-       await page1.waitForTimeout(4000);
-       await test.step('Product Packaging', async () => {
-           await rrc.selectUnitOfMeasure(td.baseUnitOfMeasure);
-           await rrc.selectConsumerUnit();
-           await rrc.enterBaseUnitPrice(td.baseUnitPrice);
-           await rrc.hoverOnNext();
-           await rrc.acceptConfirmPopup();
-           await rrc.clickOnNext();
-       });
-       await test.step('Product Pricing', async () => {
-           await rrc.selectProductUnit();
-           await rrc.clickOnAddPrice();
-           const effectiveDate = await rrc.getTodaysDate();
-           await rrc.enterPriceDetails(effectiveDate, td.list_firstCostPrice, td.distributionMethod, td.invoiceCost, td.netCost);
-           await rrc.clickOnAdd();
-           await rrc.clickOnNext();
-       });
-       await test.step('Submit Range Review', async () => {
-           await rrc.clickOnSubmit();
-           await rrc.verifyRRCSuccessMessage(td.RRC_SuccessMessage);
-       });
-   }); */
+    await test.step('Select RRC', async () => {
+        await community.clickOnRRC();
+        await community.changeRRCListView();
+        await page.waitForTimeout(2000);
+        await community.searchRRCList(td.RRCName);
+        await community.clickOnRangeReviewName();
+        page1 = await community.clickOnAddArticle();
+    });
+    const rrc = new RangeReviewFlow(page1);
+    await test.step('Range Review Flow', async () => {
+        await test.step('Product Overview', async () => {
+            const gtin = generate12DigitGTIN(); // Generate GTIN
+            console.log(`Generated GTIN: ${gtin}`);
+            await rrc.enterGTIN(gtin);
+            await page1.waitForTimeout(2000);
+            await rrc.clickOnLookup();
+            await rrc.verifyGTINSuccessMsg(td.GTIN_SuccessMessage);
+            await rrc.selectArticleType(td.articleType);
+            await rrc.selectArticleClass(td.articleClass);
+            await rrc.selectArticleCategory(td.articleCategory);
+            await rrc.selectIsForHumanConsumption(td.isHumanForConsumption);
+            await rrc.selectDataSource(td.isThirdParty);
+            await rrc.clickOnNext();
+        });
+        await page1.waitForTimeout(4000);
+        await test.step('Product Details', async () => {
+            await rrc.enterProductDescription(td.productName, td.minShelfLife, td.maxShelfLife);
+            await rrc.enterProductDistribution(td.unitsSoldPerStore, td.storesRanged, td.distributionMethod);
+            await rrc.clickOnNext();
+        });
+        await page1.waitForTimeout(4000);
+        await test.step('Product Packaging', async () => {
+            await rrc.selectUnitOfMeasure(td.baseUnitOfMeasure);
+            await rrc.selectConsumerUnit();
+            await rrc.enterBaseUnitPrice(td.baseUnitPrice);
+            await rrc.hoverOnNext();
+            await rrc.acceptConfirmPopup();
+            await rrc.clickOnNext();
+        });
+        await test.step('Product Pricing', async () => {
+            await rrc.selectProductUnit();
+            await rrc.clickOnAddPrice();
+            const effectiveDate = await rrc.getTodaysDate();
+            await rrc.enterPriceDetails(effectiveDate, td.list_firstCostPrice, td.distributionMethod, td.invoiceCost, td.netCost);
+            await rrc.clickOnAdd();
+            await rrc.clickOnNext();
+        });
+        await test.step('Submit Range Review', async () => {
+            await rrc.clickOnSubmit();
+            await rrc.verifyRRCSuccessMessage(td.RRC_SuccessMessage);
+        });
+    }); 
+    const community1 = new CommunityPage(page1);
     await test.step('Buffer Case Numbers', async () => {
-        await community.clickOnCases();
-        await community.changeCaseListView();
+        await community1.clickOnCases();
+        await community1.changeCaseListView();
         //Buffering Supplier Case Number
-        const supplierCaseNo = await community.bufferSupplierCaseNumber();
+        const supplierCaseNo = await community1.bufferSupplierCaseNumber();
         console.log('Supplier Case Number: ', supplierCaseNo);
-        // const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
         buffer.bufferedSupplierCaseNo = supplierCaseNo;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer));
         //Buffering Article Case Number
-        const articleCaseNo = await community.bufferArticleCaseNumber();
+        const articleCaseNo = await community1.bufferArticleCaseNumber();
         console.log('Article Case Number: ', articleCaseNo);
         buffer.bufferedArticleCaseNo = articleCaseNo;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer));
     });
     await test.step('Verify Case Status', async () => {
-        await community.clickOnSupplierCase(buffer.bufferedSupplierCaseNo);
-        await community.clickOnArticleCase(buffer.bufferedArticleCaseNo);
+        await community1.clickOnSupplierCase(buffer.bufferedSupplierCaseNo);
+        await community1.verifySupplierCaseDetails(td.supplierCaseOwner, td.supplierCaseType, td.supplierCaseStatus);
+        await community1.clickOnArticleCase(buffer.bufferedArticleCaseNo);
+        await community1.verifyArticleCaseDetails(td.articleCaseOwner, td.articleCaseType, td.articleCaseStatus);
+    });
+    await page1.close();
+});
+
+test('Make Article Case Successful', async ({ page }) => {
+    let page1;
+    await test.step('Login as Admin', async () => {
+        const login = new LoginPage(page);
+        await login.gotoLoginPage();
+        await login.login(td.username, td.password);
+    });
+    await page.waitForTimeout(8000);
+    const home = new SFHomePage(page);
+    await test.step('Navigate to Home', async () => {
+        await home.gotoHome();
+    });
+    await test.step('Navigate to Setup', async () => {
+        page1 = await home.gotoSetup();
+    });
+    const setup = new SetupPage(page1);
+    await test.step('Search for User and Login', async () => {
+        await setup.searchUser(td.BSS_UserName);
+        await setup.clickOnLogin(td.BSS_UserName);
+    });
+    await page1.waitForTimeout(8000);
+    const internalUser = new SF_Page_InternalUser(page1);
+    await test.step('Navigate to Article Case', async () => {
+        // await user_home.gotoBSSHome();
+        await internalUser.searchCase(buffer.bufferedArticleCaseNo);
+        await internalUser.clickOnCaseResultTab();
+        await internalUser.clickOnCase(buffer.bufferedArticleCaseNo);
+    });
+    await test.step('Update CM, CA and Merchandise Category', async () => {
+        await internalUser.expandKeyFields();
+        await internalUser.clickOnEditKeyFields();
+        await internalUser.clearCMandCA();
     });
 });

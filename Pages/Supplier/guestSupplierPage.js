@@ -1,6 +1,5 @@
 import { expect } from '@playwright/test';
-import { stat } from 'fs';
-export class supplierPage {
+export class guestSupplierPage {
     constructor(page) {
         this.page = page;
         //First Page

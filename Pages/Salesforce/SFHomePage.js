@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { stat } from 'fs';
 exports.SFHomePage =
     class SFHomePage {
         constructor(page) {
@@ -12,12 +13,15 @@ exports.SFHomePage =
             this.contactName = 'span[title="Akhil NPC"]';
             this.loginToExperienceAsUser = 'button[name="LoginToNetworkAsUser"]';
             this.myActiveCases = "a[title$='My Active Cases']";
+            this.setupGearIcon = "div[class='setupGear'] a";
+            this.setupMenu = "//li[@id='all_setup_home']/a";
             //Search Results
             this.contactResultTab = "//span[normalize-space()='Contacts']";
             this.accountResultTab = "//span[normalize-space()='Accounts']";
+            this.caseResultTab = "//span[normalize-space()='Cases']";
             this.tableLocator = "(//table[contains(@class,'slds-table')])[3]";
             this.tableRows = "tbody tr";
-            this.accountNameLink = "th span a";
+            this.accountNameLink = "//th/span/a[@title='${accountName}']";
             this.accountListViewLabel = 'Accounts||List View';
             //Account Details
             this.contactDetailsTab = "(//a[text()='Contact Details'])[2]";
@@ -26,9 +30,8 @@ exports.SFHomePage =
             this.recordTypeField = "(//*[@data-field-id='RecordRecord_Type_cField']//lightning-formatted-text)[4]";
             this.targetCountryField = "(//*[@data-field-id='RecordCountry_cField']//lightning-formatted-text)[4]";
         }
-
         async gotoHome() {
-            if (!(await this.page.locator(this.selectedMenu).isVisible())) {
+            if (!(await this.page.locator(this.myActiveCases).isVisible())) {
                 await this.page.locator(this.navMenu).waitFor({ state: 'visible' });
                 await this.page.click(this.navMenu);
                 await this.page.locator(this.homeMenu).waitFor({ state: 'visible' });
@@ -36,6 +39,18 @@ exports.SFHomePage =
                 await this.page.waitForSelector(this.myActiveCases, { visible: true });
                 await this.page.waitForSelector(this.globalSearch, { visible: true });
             }
+        }
+        async gotoSetup() {
+            await this.page.waitForSelector(this.setupGearIcon, { state: 'visible' });
+            await this.page.locator(this.setupGearIcon).click();
+            await this.page.waitForSelector(this.setupMenu, { state: 'visible' });
+            const [page1] = await Promise.all([
+                this.page.waitForEvent("popup"),
+                await this.page.locator(this.setupMenu).click()
+            ]);
+            await page1.waitForLoadState('load');
+            await this.page.close();
+            return page1;
         }
         async loginAsSupplier(contact) {
             await this.page.click(this.globalSearch);
@@ -58,8 +73,11 @@ exports.SFHomePage =
             await this.page.click(this.accountResultTab);
         }
         async clickOnAccount(accountName) {
-            await this.page.getByRole('link', { name: accountName }).waitFor({ state: 'visible' });
-            await this.page.getByRole('link', { name: accountName }).click();
+            const accountLink = this.accountNameLink.replace("${accountName}", accountName);
+            await this.page.locator(accountLink).waitFor({ state: 'visible' });
+            await this.page.locator(accountLink).click();
+            // await this.page.getByRole('link', { name: accountName }).waitFor({ state: 'visible' });
+            // await this.page.getByRole('link', { name: accountName }).click();
         }
         async verifyAccountDetails(abn, country) {
             // await this.page.waitForSelector(this.abnNzbnField, { visible: true });

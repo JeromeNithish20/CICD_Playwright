@@ -55,6 +55,7 @@ export class RangeReviewFlow {
     }
     async clickOnLookup() {
         await this.page.waitForSelector(this.lookupButton, { state: 'visible' });
+        await this.page.locator(this.lookupButton).scrollIntoViewIfNeeded();
         await this.page.click(this.lookupButton);
         // await this.page.waitForLoadState('networkidle');
     }
@@ -65,6 +66,7 @@ export class RangeReviewFlow {
     }
     async selectArticleType(articleType) {
         await this.page.waitForSelector(this.articleTypeDropdown, { state: 'visible' });
+        await this.page.locator(this.articleTypeDropdown).scrollIntoViewIfNeeded();
         await this.page.selectOption(this.articleTypeDropdown, { value: articleType });
     }
     async selectArticleClass(articleClass) {
@@ -85,6 +87,7 @@ export class RangeReviewFlow {
     }
     async clickOnNext() {
         await this.page.waitForSelector(this.nextButton, { state: 'visible' });
+        await this.page.locator(this.nextButton).scrollIntoViewIfNeeded();
         await this.page.click(this.nextButton);
         // await this.page.waitForLoadState('networkidle');
         // await this.page.waitForTimeout(3000);
