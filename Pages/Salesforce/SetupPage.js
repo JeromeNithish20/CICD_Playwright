@@ -5,6 +5,9 @@ export class SetupPage {
         this.searchUsername = "//span[@title='${user}']";
         this.userFrame = "iframe[title*='${user}']";
         this.loginButton = "#topButtonRow input[title='Login']";
+        this.profileIcon = "[class='uiImage']";
+        this.logoutButton = "//a[text()='Log Out']";
+        this.userNameInput = '#username';
     }
     async searchUser(user) {
         await this.page.waitForSelector(this.searchSetup, { state: 'visible' });
@@ -19,8 +22,15 @@ export class SetupPage {
         const dynamicUserFrame = this.userFrame.replace("${user}", user);
         await this.page.waitForSelector(dynamicUserFrame, { state: 'visible' });
         const frame = await this.page.frameLocator(dynamicUserFrame);
-        // const frameContent = await frame.contentFrame();
         await frame.locator(this.loginButton).waitFor({ state: 'visible' });
         await frame.locator(this.loginButton).click();
+    }
+    async logoutAsAdmin() {
+        await this.page.waitForSelector(this.profileIcon, { state: 'visible' });
+        await this.page.click(this.profileIcon);
+        await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
+        await this.page.click(this.logoutButton);
+        await this.page.waitForSelector(this.userNameInput, { state: 'visible' });
+        await this.page.close();
     }
 }

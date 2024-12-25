@@ -12,7 +12,7 @@ const fs = require('fs');
 const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
 test.setTimeout(180000);
 
-test.only('Supplier Registration', async ({ page }) => {
+test('Supplier Registration', async ({ page }) => {
     const guest = new guestSupplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
         await guest.gotoSupplierPage();
@@ -169,7 +169,7 @@ test('Login as Supplier and Initiate a New RRC', async ({ page }) => {
     await page1.close();
 });
 
-test('Make Article Case Successful', async ({ page }) => {
+test('Update CM and CA as BSS', async ({ page }) => {
     let page1;
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
@@ -192,14 +192,70 @@ test('Make Article Case Successful', async ({ page }) => {
     await page1.waitForTimeout(8000);
     const internalUser = new SF_Page_InternalUser(page1);
     await test.step('Navigate to Article Case', async () => {
-        // await user_home.gotoBSSHome();
+        await internalUser.gotoBSSHome();
         await internalUser.searchCase(buffer.bufferedArticleCaseNo);
         await internalUser.clickOnCaseResultTab();
         await internalUser.clickOnCase(buffer.bufferedArticleCaseNo);
     });
     await test.step('Update CM, CA and Merchandise Category', async () => {
-        await internalUser.expandKeyFields();
+        await internalUser.collapseKeyFields();
+        await internalUser.clickOnEditCM();
+        await internalUser.enterCM(td.categoryManager);
+        await internalUser.selectCMOption(td.categoryManager);
+        await internalUser.enterCA(td.categoryAssistant);
+        await internalUser.selectCAOption(td.categoryAssistant);
+        await internalUser.clickOnSave();
+    });
+    await test.step('Change Case Owner', async () => {
+        await internalUser.changeCaseOwner(td.categoryManager);
+        await internalUser.clickOnSave();
+    });
+    await test.step('Logout As BSS User', async () => {
+        await internalUser.logoutAsInternalUser();
+    });
+    await test.step('Login as Admin', async () => {
+        await setup.logoutAsAdmin();
+    });
+});
+
+test('Update Merchandise Category and Case Status as CM', async ({ page }) => {
+    let page1;
+    await test.step('Login as Admin', async () => {
+        const login = new LoginPage(page);
+        await login.gotoLoginPage();
+        await login.login(td.username, td.password);
+    });
+    await page.waitForTimeout(8000);
+    const home = new SFHomePage(page);
+    await test.step('Navigate to Home', async () => {
+        await home.gotoHome();
+    });
+    await test.step('Navigate to Setup', async () => {
+        page1 = await home.gotoSetup();
+    });
+    const setup = new SetupPage(page1);
+    await test.step('Search for CM User and Login', async () => {
+        await setup.searchUser(td.CM_UserName);
+        await setup.clickOnLogin(td.CM_UserName);
+    });
+    await page1.waitForTimeout(8000);
+    const internalUser = new SF_Page_InternalUser(page1);
+    await test.step('Navigate to Article Case', async () => {
+        await internalUser.gotoBSSHome();
+        await internalUser.searchCase(buffer.bufferedArticleCaseNo);
+        await internalUser.clickOnCaseResultTab();
+        await internalUser.clickOnCase(buffer.bufferedArticleCaseNo);
+    });
+    await test.step('Update Merchandise Category', async () => {
+        await internalUser.collapseKeyFields();
         await internalUser.clickOnEditKeyFields();
-        await internalUser.clearCMandCA();
+        await internalUser.enterMerchandiseCategory(td.merchandiseCategory);
+        await internalUser.clickOnSave();
+    });
+    await test.step('Logout As CM User', async () => {
+        await internalUser.logoutAsInternalUser();
+    });
+    await test.step('Login as Admin', async () => {
+        await setup.logoutAsAdmin();
     });
 });
