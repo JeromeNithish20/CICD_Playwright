@@ -32,7 +32,12 @@ export class CommunityPage {
         this.caseOwner = "(//dt[@title='Case Owner']/following-sibling::div//span)[1]";
         this.caseStatus = "//dt[@title='Status']/following-sibling::div//span";
         this.caseType = "//dt[@title='Type']/following-sibling::div//span";
-
+        this.editCaseStatus_btn = "button[title='Edit Status']";
+        this.caseStatusDropdown = "//span[text()='Status']/../following-sibling::div//a";
+        this.caseStatusValue = "a[title='${caseStatus}']";
+        this.saveButton = "//button[@title='Save']";
+        this.profileIcon = "a[class='trigger-link  ']";
+        this.logoutButton = "a[title='Logout']";
     }
     async displayAccountName() {
         await this.page.waitForSelector(this.accountName, { state: 'visible' });
@@ -94,42 +99,9 @@ export class CommunityPage {
         await this.page.locator(this.rrcButton).waitFor({ state: 'visible' });
         await this.page.locator(this.rrcButton).click();
     }
-
-
     async clickOnMyRRCButton() {
         await this.page.waitForSelector(this.myRRCButton, { visible: true });
         await this.page.click(this.myRRCButton);
-    }
-    async selectDivision(division) {
-        try {
-            //Checking if the popup is visible and closing it
-            const popupSelector = this.page.locator(this.rrcPopup);
-            await this.page.waitForSelector(popupSelector, { state: 'visible', timeout: 15000 });
-            console.log('Popup appeared');
-            await this.page.click(this.rrcPopupClose);
-        } catch (e) {
-            console.log('RRC Popup did not appear within the timeout');
-            await this.page.waitForSelector(this.divisionDropdown, { state: 'visible' });
-            await this.page.selectOption(this.divisionDropdown, { value: division });
-        }
-
-    }
-    async selectTradingDept(tradingDept) {
-        await this.page.waitForSelector(this.tradingDeptDropdown, { state: 'visible' });
-        await this.page.locator(this.tradingDeptDropdown).click();
-        await this.page.getByPlaceholder('Search', { exact: true }).waitFor({ state: 'visible' });
-        await this.page.getByPlaceholder('Search', { exact: true }).click();
-        await this.page.getByPlaceholder('Search', { exact: true }).fill(tradingDept);
-        await this.page.waitForSelector("span[title='${tradingDept}']", { state: 'visible' });
-        await this.page.click("span[title='${tradingDept}']");
-    }
-    async selectSubcategory(subcategory) {
-        await this.page.locator(this.subcategoryDropdown).click();
-        await this.page.getByPlaceholder('Search', { exact: true }).waitFor({ state: 'visible' });
-        await this.page.getByPlaceholder('Search', { exact: true }).click();
-        await this.page.getByPlaceholder('Search', { exact: true }).fill(subcategory);
-        await this.page.waitForSelector("span[title='${subcategory}']", { state: 'visible' });
-        await this.page.click("span[title='${subcategory}']");
     }
     async changeRRCListView() {
         try {
@@ -241,5 +213,27 @@ export class CommunityPage {
         expect(act_caseStatus).toBe(caseStatus);
         await this.page.goBack();
         await this.page.waitForLoadState('load');
+    }
+    async clickOnEditCaseStatus() {
+        await this.page.waitForSelector(this.editCaseStatus_btn, { state: 'visible' });
+        await this.page.click(this.editCaseStatus_btn);
+    }
+    async selectCaseStatus(caseStatus) {
+        await this.page.waitForSelector(this.caseStatusDropdown, { state: 'visible' });
+        await this.page.click(this.caseStatusDropdown);
+        const dynamicCaseStatus = this.caseStatusValue.replace('${caseStatus}', caseStatus);
+        await this.page.waitForSelector(dynamicCaseStatus, { state: 'visible' });
+        await this.page.click(dynamicCaseStatus);
+    }
+    async clickOnSave() {
+        await this.page.waitForSelector(this.saveButton, { state: 'visible' });
+        await this.page.click(this.saveButton);
+        await this.page.waitForSelector(this.saveButton, { state: 'hidden' });
+    }
+    async logoutAsSupplierUser() {
+        await this.page.waitForSelector(this.profileIcon, { state: 'visible' });
+        await this.page.click(this.profileIcon);
+        await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
+        await this.page.click(this.logoutButton);
     }
 }

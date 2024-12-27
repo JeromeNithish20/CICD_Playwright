@@ -4,6 +4,7 @@ exports.SFHomePage =
     class SFHomePage {
         constructor(page) {
             this.page = page;
+            this.grossMarginOk_btn = "//button[text()='OK']";
             this.selectedMenu = "//a[@title='Home']";
             this.navMenu = 'button[title="Show Navigation Menu"]';
             this.homeMenu = '//ul[@role="menu"]//span[text()="Home"]';
@@ -25,10 +26,19 @@ exports.SFHomePage =
             this.accountListViewLabel = 'Accounts||List View';
             //Account Details
             this.contactDetailsTab = "(//a[text()='Contact Details'])[2]";
-            this.abnNzbnField = "(//*[@data-field-id='RecordABN_cField']//lightning-formatted-text)[4]";
+            this.abnNzbnField = "(//span[text()='ABN/NZBN']/../../following-sibling::dd)[2]";
             this.accountNameField = "(//*[@data-field-id='RecordNameField']//lightning-formatted-text)[4]";
-            this.recordTypeField = "(//*[@data-field-id='RecordRecord_Type_cField']//lightning-formatted-text)[4]";
-            this.targetCountryField = "(//*[@data-field-id='RecordCountry_cField']//lightning-formatted-text)[4]";
+            this.recordTypeField = "//span[text()='Record Type']/../../following-sibling::dd";
+            this.targetCountryField = "//span[text()='Target Country']/../../following-sibling::dd";
+            this.profileIcon = "[class='uiImage']";
+            this.logoutButton = "//a[text()='Log Out']";
+            this.userNameInput = '#username';
+        }
+        async verifyGrossMarginPopup() {
+            const isPopupVisible = (await this.page.locator(this.grossMarginOk_btn).isVisible());
+            if (isPopupVisible) {
+                await this.page.click(this.grossMarginOk_btn);
+            }
         }
         async gotoHome() {
             if (!(await this.page.locator(this.myActiveCases).isVisible())) {
@@ -102,5 +112,13 @@ exports.SFHomePage =
             await this.page.getByRole('button', { name: 'Log in to Experience as User' }).waitFor({ state: 'visible' });
             await this.page.getByRole('button', { name: 'Log in to Experience as User' }).click();
             await this.page.waitForLoadState('load');
+        }
+        async logoutAsAdmin() {
+            await this.page.waitForSelector(this.profileIcon, { state: 'visible' });
+            await this.page.click(this.profileIcon);
+            await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
+            await this.page.click(this.logoutButton);
+            await this.page.waitForSelector(this.userNameInput, { state: 'visible' });
+            await this.page.close();
         }
     }

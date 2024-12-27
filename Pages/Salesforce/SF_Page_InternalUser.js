@@ -1,3 +1,5 @@
+import { stat } from "fs";
+
 export class SF_Page_InternalUser {
     constructor(page) {
         this.page = page;
@@ -8,11 +10,12 @@ export class SF_Page_InternalUser {
         //Gloabl Search
         this.globalSearch = 'button[aria-label="Search"]';
         this.globalSearchBox = 'Search...';
-        this.caseResultTab = "//span[normalize-space()='Cases']";
+        this.caseResultTab = "//a//span[text()='Cases']";
         //Case Details
         this.keyFields = "h2[class='title']";
         this.showMore_btn = "//button[@title='Show More']";
         this.showLess_btn = "//button[@title='Show Less']";
+        this.grossMarginOk_btn = "//button[text()='OK']";
         //Key Fields Edit Pop-up
         /* 
         this.editKeyFields_btn = "//a[@title='Edit Key Fields']";
@@ -26,6 +29,12 @@ export class SF_Page_InternalUser {
         this.CM_CA_DropDown_Option = "//div[@title='${user}']";
         this.saveButton = "//div[@class='inlineFooter']//button[@title='Save']"; */
         this.editCM_btn = "//button[@title='Edit Category Manager']";
+        this.editMerchCategory_btn = "//button[@title='Edit Merchandise Category']";
+        this.editCaseStatus_btn = "(//button[@title='Edit Status'])[1]";
+        this.caseStatus_Dropdown = "//button[@aria-label='Status']";
+        this.successful_DropdownValue = "span[title='${status}']";
+        this.merchCategory_input = "input[placeholder='Search Composites...']";
+        this.merchCategory_Dropdown_Option = "span [title='${merchCategory}']";
         this.clearCM = "//label[text()='Category Manager']/following-sibling::div//button";
         this.clearCA = "//label[text()='Category Assistant']/following-sibling::div//button";
         this.CM_input = "//label[text()='Category Manager']/following-sibling::div//input";
@@ -39,6 +48,7 @@ export class SF_Page_InternalUser {
         this.caseOwner_Input = "//label[text()='Case Owner']/following-sibling::div//input";
         this.saveButton = "//button[@name='SaveEdit']";
         this.logoutUser = "a[class='action-link']";
+        this.toastMessage_Success = "//span[contains(@class,'toastMessage')]";
     }
     async gotoBSSHome() {
         if (!(await this.page.locator(this.openButton).isVisible())) {
@@ -63,28 +73,52 @@ export class SF_Page_InternalUser {
         await this.page.getByRole('link', { name: caseNumber }).waitFor({ state: 'visible' });
         await this.page.getByRole('link', { name: caseNumber }).click();
     }
+    async verifyGrossMarginPopup() {
+        const popupTimeout = 5000;
+        try {
+            await this.page.locator(this.grossMarginOk_btn).waitFor({
+                state: 'visible',
+                timeout: popupTimeout
+            });
+            await this.page.click(this.grossMarginOk_btn);
+            await this.page.locator(this.grossMarginOk_btn).waitFor({ state: 'hidden' });
+        } catch (error) {
+        }
+    }
     async collapseKeyFields() {
-        const isVisible = (await this.page.locator(this.keyFields).isVisible());
+        const isVisible = (await this.page.locator(this.showLess_btn).isVisible());
         if (isVisible) {
             await this.page.waitForSelector(this.showLess_btn, { state: 'visible' });
             await this.page.click(this.showLess_btn);
         }
     }
-    async clickOnEditKeyFields() {
-        await this.page.waitForSelector(this.editKeyFields_btn, { state: 'visible' });
-        await this.page.click(this.editKeyFields_btn);
-    }
     async clickOnEditCM() {
         await this.page.waitForSelector(this.editCM_btn, { state: 'visible' });
         await this.page.click(this.editCM_btn);
+    }
+    async clickOnEditMerchCategory() {
+        await this.page.waitForSelector(this.editMerchCategory_btn, { state: 'visible' });
+        await this.page.click(this.editMerchCategory_btn);
+    }
+    async enterMerchandiseCategory(merchCategory) {
+        const merchCategory_inputBox = await this.page.locator(this.merchCategory_input);
+        await merchCategory_inputBox.waitFor({ state: 'visible' });
+        await merchCategory_inputBox.scrollIntoViewIfNeeded();
+        await merchCategory_inputBox.fill(merchCategory);
+        await merchCategory_inputBox.click();
+        const dynamicMerchCategory = this.merchCategory_Dropdown_Option.replace("${merchCategory}", merchCategory);
+        await this.page.waitForSelector(dynamicMerchCategory, { state: 'visible' });
+        await this.page.click(dynamicMerchCategory);
     }
     async enterCM(CM) {
         const isVisible = await this.page.locator(this.clearCM).isVisible();
         if (isVisible) {
             await this.page.click(this.clearCM);
         }
-        await this.page.locator(this.CM_input).waitFor({ state: 'visible' });
-        await this.page.locator(this.CM_input).fill(CM);
+        const CM_inputBox = await this.page.locator(this.CM_input);
+        await CM_inputBox.waitFor({ state: 'visible' });
+        await CM_inputBox.fill(CM);
+        await CM_inputBox.click();
     }
     async selectCMOption(CM) {
         // Dynamically replace ${user} with the actual user value
@@ -98,8 +132,10 @@ export class SF_Page_InternalUser {
         if (isVisible) {
             await this.page.click(this.clearCA);
         }
-        await this.page.locator(this.CA_input).waitFor({ state: 'visible' });
-        await this.page.locator(this.CA_input).fill(CA);
+        const CA_inputBox = await this.page.locator(this.CA_input);
+        await CA_inputBox.waitFor({ state: 'visible' });
+        await CA_inputBox.fill(CA);
+        await CA_inputBox.click();
     }
     async selectCAOption(CA) {
         // Dynamically replace ${user} with the actual user value
@@ -124,12 +160,27 @@ export class SF_Page_InternalUser {
                 await this.page.click(this.caseOwner_User);
             }
         }
-        await this.page.locator(this.caseOwner_Input).waitFor({ state: 'visible' });
-        await this.page.locator(this.caseOwner_Input).fill(CM);
+        const caseOwner_inputBox = await this.page.locator(this.caseOwner_Input);
+        await caseOwner_inputBox.waitFor({ state: 'visible' });
+        await caseOwner_inputBox.fill(CM);
         const dynamicCMOption = this.CM_Dropdown_Option.replace("${user}", CM);
-        await this.page.waitForSelector(dynamicCMOption, { state: 'visible' });
-        await this.page.locator(dynamicCMOption).scrollIntoViewIfNeeded();
-        await this.page.click(dynamicCMOption);
+        const dynamicCMOption_locator = await this.page.locator(dynamicCMOption);
+        await dynamicCMOption_locator.waitFor({ state: 'visible' });
+        await dynamicCMOption_locator.scrollIntoViewIfNeeded();
+        await dynamicCMOption_locator.click();
+    }
+    async changeCaseStatus(status) {
+        await this.page.waitForSelector(this.editCaseStatus_btn, { state: 'visible' });
+        await this.page.click(this.editCaseStatus_btn);
+        await this.page.waitForSelector(this.caseStatus_Dropdown, { state: 'visible' });
+        await this.page.click(this.caseStatus_Dropdown);
+        const dynamicStatus = this.successful_DropdownValue.replace("${status}", status);
+        await this.page.waitForSelector(dynamicStatus, { state: 'visible' });
+        await this.page.click(dynamicStatus);
+    }
+    async reloadPage() {
+        await this.page.reload();
+        await this.page.waitForSelector(this.editCaseStatus_btn, { state: 'visible' });
     }
     async logoutAsInternalUser() {
         await this.page.click(this.logoutUser);

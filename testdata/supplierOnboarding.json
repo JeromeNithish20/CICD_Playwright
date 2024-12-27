@@ -56,6 +56,12 @@
 
     "merchCategory": "118010101",
     "categoryManager": "Sruthi UAT CM",
-    "categoryAssistant": "Sruthi UAT CA"
+    "categoryAssistant": "Sruthi UAT CA",
+    "caseStatus_Successful": "Successful",
+    "toastMessage": "Case has been successfully updated.",
 
+    "businessOrganization": "Woolworths - Supermarkets",
+    "accountExecutiveEmail": "user1@test.com",
+    "financeManagerEmail": "user2@test.com",
+    "caseStatus_InformationProvided": "Information Provided"
 }
