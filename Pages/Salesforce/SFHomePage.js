@@ -90,17 +90,11 @@ exports.SFHomePage =
             // await this.page.getByRole('link', { name: accountName }).click();
         }
         async verifyAccountDetails(abn, country) {
-            // await this.page.waitForSelector(this.abnNzbnField, { visible: true });
-            // const abnNzbn = await this.page.locator(this.abnNzbnField).textContent();
-            // expect(abnNzbn).toBe(abn);
-            // const targetCountry = await this.page.locator(this.targetCountryField).textContent();
-            // expect(targetCountry).toBe(country);
-            // await this.page.waitForSelector(this.contactDetailsTab, { visible: true });
-            // await this.page.click(this.contactDetailsTab);
-            await this.page.locator('dd').filter({ hasText: 'Edit ABN/NZBN' }).locator('span').first().waitFor({ state: 'visible' });
-            const abn1 = await this.page.locator('dd').filter({ hasText: 'Edit ABN/NZBN' }).locator('span').first().textContent();
-            console.log('ABN:', abn1);
-            expect(abn1).toBe(abn);
+            await this.page.locator(this.abnNzbnField).waitFor({ state: 'visible' });
+            const abnNzbn = await this.page.locator(this.abnNzbnField).innerText();
+            expect(abnNzbn).toContain(abn);
+            const targetCountry = await this.page.locator(this.targetCountryField).innerText();
+            expect(targetCountry).toContain(country);
         }
         async clickOnContactDetails() {
             await this.page.getByRole('tab', { name: 'Contact Details' }).waitFor({ state: 'visible' });

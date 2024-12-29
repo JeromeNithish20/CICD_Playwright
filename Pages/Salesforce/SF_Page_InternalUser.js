@@ -16,23 +16,9 @@ export class SF_Page_InternalUser {
         this.showMore_btn = "//button[@title='Show More']";
         this.showLess_btn = "//button[@title='Show Less']";
         this.grossMarginOk_btn = "//button[text()='OK']";
-        //Key Fields Edit Pop-up
-        /* 
-        this.editKeyFields_btn = "//a[@title='Edit Key Fields']";
-        this.merchCategory_input = "input[title='Search Composites']";
-        this.CM_label = "//label/span[text()='Category Manager']";
-        this.CA_label = "//label/span[text()='Category Assistant']";
-        this.clearCM = "(//label/span[text()='Category Manager'])/parent::label/following-sibling::div//a[@class='deleteAction']";
-        this.clearCA = "(//label/span[text()='Category Assistant'])/parent::label/following-sibling::div//a[@class='deleteAction']";
-        this.CM_input = "(//input[@title='Search People'])[1]";
-        this.CA_input = "(//input[@title='Search People'])[2]";
-        this.CM_CA_DropDown_Option = "//div[@title='${user}']";
-        this.saveButton = "//div[@class='inlineFooter']//button[@title='Save']"; */
+        //Case Fields
         this.editCM_btn = "//button[@title='Edit Category Manager']";
         this.editMerchCategory_btn = "//button[@title='Edit Merchandise Category']";
-        this.editCaseStatus_btn = "(//button[@title='Edit Status'])[1]";
-        this.caseStatus_Dropdown = "//button[@aria-label='Status']";
-        this.successful_DropdownValue = "span[title='${status}']";
         this.merchCategory_input = "input[placeholder='Search Composites...']";
         this.merchCategory_Dropdown_Option = "span [title='${merchCategory}']";
         this.clearCM = "//label[text()='Category Manager']/following-sibling::div//button";
@@ -168,15 +154,6 @@ export class SF_Page_InternalUser {
         await dynamicCMOption_locator.waitFor({ state: 'visible' });
         await dynamicCMOption_locator.scrollIntoViewIfNeeded();
         await dynamicCMOption_locator.click();
-    }
-    async changeCaseStatus(status) {
-        await this.page.waitForSelector(this.editCaseStatus_btn, { state: 'visible' });
-        await this.page.click(this.editCaseStatus_btn);
-        await this.page.waitForSelector(this.caseStatus_Dropdown, { state: 'visible' });
-        await this.page.click(this.caseStatus_Dropdown);
-        const dynamicStatus = this.successful_DropdownValue.replace("${status}", status);
-        await this.page.waitForSelector(dynamicStatus, { state: 'visible' });
-        await this.page.click(dynamicStatus);
     }
     async reloadPage() {
         await this.page.reload();

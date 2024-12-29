@@ -58,10 +58,16 @@
     "categoryManager": "Sruthi UAT CM",
     "categoryAssistant": "Sruthi UAT CA",
     "caseStatus_Successful": "Successful",
+    "caseStatus_Approved": "Approved",
+    "caseStatus_InReview": "In Review",
+    "CSA_QueueName": "Commercial Support Assistant (CSA) Queue",
     "toastMessage": "Case has been successfully updated.",
 
     "businessOrganization": "Woolworths - Supermarkets",
     "accountExecutiveEmail": "user1@test.com",
     "financeManagerEmail": "user2@test.com",
-    "caseStatus_InformationProvided": "Information Provided"
+    "caseStatus_InfoProvided": "Information Provided",
+
+    "refVendor": "TEMPLATE FLP AU DOMESTIC",
+    "paymentTermsCode": "14 days 02.00%"
 }
