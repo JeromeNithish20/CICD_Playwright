@@ -2,20 +2,21 @@ import { expect } from '@playwright/test';
 export class SF_CasesPage {
     constructor(page) {
         this.page = page;
-        this.accountNameLink = "span.slds-truncate>slot";
+        this.accountNameLink = "//span[@class='slds-truncate']/slot[text()='${accountName}']";
         this.caseOwner = "//p[@title='Case Owner']/following-sibling::p/slot";
-        this.editCaseStatus_btn = "(//button[@title='Edit Status'])[2]";
+        this.editCaseStatus_btn = "(//slot/*[text()='$caseNo']/ancestor::dl)[2]//button[@title='Edit Status']";
         this.caseStatus = "//p[@title='Status']/following-sibling::p/slot";//"(//dl[@class='slds-form'])[1]//span[text()='Status']/../../following-sibling::dd//*[@slot='outputField']";
-        this.caseStatusDropdown = "(//dl[@class='slds-form'])[3]//button[@aria-label='Status']";//"(//dl[@class='slds-form'])[1]//button[@aria-label='Status']";
+        this.caseStatusDropdown = "//*[text()='$caseNo']/ancestor::records-record-layout-row/following-sibling::records-record-layout-row//button[@aria-label='Status']";//"(//dl[@class='slds-form'])[1]//button[@aria-label='Status']";
         this.caseStatusDropdown_successful = "span[title='${status}']";
         this.saveButton = "//button[@name='SaveEdit']";
-        this.editCaseOwner_btn = "//button[@title='Edit Case Owner']";
+        this.editCaseOwner_btn = "//*[text()='$caseNo']/ancestor::records-record-layout-item/following-sibling::records-record-layout-item//button[@title='Edit Case Owner']";
         this.clearCaseOwner = "//label[text()='Case Owner']/following-sibling::div//button";
         this.caseOwner_type = "//label[text()='Case Owner']/following-sibling::div//button/span";
         this.caseOwner_User = "//span[@title='User']";
         this.caseOwner_Input = "//label[text()='Case Owner']/following-sibling::div//input";
         this.caseOwnerDropdownValue = "(//span//*[@title='${user}'])[1]";
-        this.showMoreActions = "//span[text()='Show more actions']/parent::button";
+        this.showMoreActions = "//a[contains(@title,'$caseNo')]/ancestor::div[contains(@class,'tabsetHeader')]/following-sibling::div//span[text()='Show more actions']/parent::button";
+        // //"//span[text()='Show more actions']/parent::button";
         this.sendToSAP = "//*[@title='Send to SAP']//a";
         //Account Details
         this.vendorNumber = "//p[@title='Vendor Number']/following-sibling::p/slot/*";
@@ -35,21 +36,24 @@ export class SF_CasesPage {
         this.paymentTermsCodeDropdown = "//label[text()='Payment Terms Code']/following-sibling::div//button";
         this.paymentTermsCodeOption = "span[title='${paymentTermsCode}']";
     }
-    async clickOnEditCaseStatus() {
-        await this.page.waitForSelector(this.editCaseStatus_btn, { state: 'visible' });
-        await this.page.click(this.editCaseStatus_btn);
+    async clickOnEditCaseStatus(caseNo) {
+        const editCaseStatus_btn = this.editCaseStatus_btn.replace("$caseNo", caseNo);
+        await this.page.waitForSelector(editCaseStatus_btn, { state: 'visible' });
+        await this.page.click(editCaseStatus_btn);
     }
-    async changeCaseStatus(status) {
+    async changeCaseStatus(caseNo, status) {
         // await this.page.waitForSelector(this.saveButton, { state: 'hidden' });
-        await this.page.waitForSelector(this.caseStatusDropdown, { state: 'visible' });
-        await this.page.click(this.caseStatusDropdown);
+        const caseStatusDropdown = this.caseStatusDropdown.replace("$caseNo", caseNo);
+        await this.page.waitForSelector(caseStatusDropdown, { state: 'visible' });
+        await this.page.click(caseStatusDropdown);
         const dynamicStatus = this.caseStatusDropdown_successful.replace("${status}", status);
         await this.page.waitForSelector(dynamicStatus, { state: 'visible' });
         await this.page.click(dynamicStatus);
     }
-    async changeCaseOwner_User(user) {
-        await this.page.waitForSelector(this.editCaseOwner_btn, { state: 'visible' });
-        await this.page.click(this.editCaseOwner_btn);
+    async changeCaseOwner_User(caseNo, user) {
+        const editCaseOwner_btn = this.editCaseOwner_btn.replace("$caseNo", caseNo);
+        await this.page.waitForSelector(editCaseOwner_btn, { state: 'visible' });
+        await this.page.click(editCaseOwner_btn);
         const isClearCaseOwnerVisible = await this.page.locator(this.clearCaseOwner).isVisible();
         if (isClearCaseOwnerVisible) {
             await this.page.waitForTimeout(1000);
@@ -63,6 +67,7 @@ export class SF_CasesPage {
         const caseOwner_inputBox = await this.page.locator(this.caseOwner_Input);
         await caseOwner_inputBox.waitFor({ state: 'visible' });
         await caseOwner_inputBox.fill(user);
+        await caseOwner_inputBox.press('Space');
         const dynamicUserOption = this.caseOwnerDropdownValue.replace("${user}", user);
         const dynamicUserOption_locator = await this.page.locator(dynamicUserOption);
         await dynamicUserOption_locator.waitFor({ state: 'visible' });
@@ -74,21 +79,31 @@ export class SF_CasesPage {
         await this.page.waitForSelector(this.saveButton, { state: 'hidden' });
     }
     async verifyCaseDetails(expected_CaseOwner, expected_CaseStatus) {
-        await this.page.waitForSelector(this.caseOwner, {state: 'visible'});
+        await this.page.waitForSelector(this.caseOwner, { state: 'visible' });
         const caseOwner = await this.page.locator(this.caseOwner).innerText();
         expect(caseOwner).toContain(expected_CaseOwner);
-        await this.page.waitForSelector(this.caseStatus, {state: 'visible'});
+        await this.page.waitForSelector(this.caseStatus, { state: 'visible' });
         const actual_caseStatus = await this.page.locator(this.caseStatus).innerText();
-        console.log("Case Status: " + actual_caseStatus);
         expect(actual_caseStatus).toContain(expected_CaseStatus);
+    }
+    async reloadPageUntilReviewStatus() {
+        while (true) {
+            await this.page.waitForLoadState('load');
+            await this.page.reload({ waitUntil: 'load' });
+            await this.page.waitForTimeout(2000);
+            const actual_caseStatus = await this.page.locator(this.caseStatus).innerText();
+            if (actual_caseStatus.includes("In Review")) {
+                break;
+            }
+        }
     }
     async reloadPage() {
         await this.page.reload();
     }
-    async navigateToAccount() {
-        const accountNameLink = await this.page.locator(this.accountNameLink).nth(0);
-        await accountNameLink.waitFor({ state: 'visible' });
-        await accountNameLink.click();
+    async navigateToAccount(accountName) {
+        const accountNameLink = this.accountNameLink.replace("${accountName}", accountName);
+        await this.page.locator(accountNameLink).waitFor({ state: 'visible' });
+        await this.page.locator(accountNameLink).click();
     }
     async clickOnEditSearchTerm1() {
         await this.page.waitForSelector(this.editSearchTerm1, { state: 'visible' });
@@ -101,7 +116,7 @@ export class SF_CasesPage {
         await this.page.waitForSelector(this.searchTerm2, { state: 'visible' });
         const searchTerm2_Value = accountName.substring(0, 6);
         await this.page.fill(this.searchTerm2, searchTerm2_Value);
-    } 
+    }
     async clickOnEditTradingTerm() {
         await this.page.waitForSelector(this.editTradingTerm_btn, { state: 'visible' });
         await this.page.click(this.editTradingTerm_btn);
@@ -147,9 +162,10 @@ export class SF_CasesPage {
         await this.page.waitForSelector(paymentTermsCodeOption, { state: 'visible' });
         await this.page.click(paymentTermsCodeOption);
     }
-    async clickOnShowMoreActions() {
-        await this.page.waitForSelector(this.showMoreActions, { state: 'visible' });
-        await this.page.click(this.showMoreActions);
+    async clickOnShowMoreActions(caseNo) {
+        const showMoreActions = this.showMoreActions.replace('$caseNo', caseNo);
+        await this.page.waitForSelector(showMoreActions, { state: 'visible' });
+        await this.page.click(showMoreActions);
     }
     async clickOnSendToSAP() {
         await this.page.waitForSelector(this.sendToSAP, { state: 'visible' });
@@ -166,5 +182,5 @@ export class SF_CasesPage {
     }
     async navigateBack() {
         await this.page.goBack();
-    }  
+    }
 }

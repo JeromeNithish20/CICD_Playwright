@@ -1,0 +1,6 @@
+Welcome Popup did not appear within the timeout. Proceeding...
+Navigating to RRC.
+Generated GTIN: 980671040119
+Welcome Popup did not appear within the timeout. Proceeding...
+Supplier Case Number:  03333495
+Article Case Number:  03333496

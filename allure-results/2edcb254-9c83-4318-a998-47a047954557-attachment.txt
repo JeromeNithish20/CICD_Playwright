@@ -1,0 +1,3 @@
+Welcome Popup did not appear within the timeout. Proceeding...
+Navigating to RRC.
+Generated GTIN: 982486464166

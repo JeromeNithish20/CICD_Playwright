@@ -1,0 +1,10 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="82.56631200000015">
+<testsuite name="supplierOnboarding.spec.js" timestamp="2025-01-01T07:25:46.527Z" hostname="Google Chrome" tests="1" failures="0" skipped="0" time="79.064" errors="0">
+<testcase name="Logging in as BSS and Syncing the Case" classname="supplierOnboarding.spec.js" time="79.064">
+<system-out>
+<![CDATA[Vendor Number: 0011909001
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

@@ -4,6 +4,7 @@ exports.SFHomePage =
     class SFHomePage {
         constructor(page) {
             this.page = page;
+            this.logoutUser = "a[class='action-link']";
             this.grossMarginOk_btn = "//button[text()='OK']";
             this.selectedMenu = "//a[@title='Home']";
             this.navMenu = 'button[title="Show Navigation Menu"]';
@@ -26,10 +27,10 @@ exports.SFHomePage =
             this.accountListViewLabel = 'Accounts||List View';
             //Account Details
             this.contactDetailsTab = "(//a[text()='Contact Details'])[2]";
-            this.abnNzbnField = "(//span[text()='ABN/NZBN']/../../following-sibling::dd)[2]";
+            this.abnNzbnField = "(//span[text()='ABN/NZBN']/../../following-sibling::dd//*[@slot='output'])";
             this.accountNameField = "(//*[@data-field-id='RecordNameField']//lightning-formatted-text)[4]";
             this.recordTypeField = "//span[text()='Record Type']/../../following-sibling::dd";
-            this.targetCountryField = "//span[text()='Target Country']/../../following-sibling::dd";
+            this.targetCountryField = "(//span[text()='Target Country']/../../following-sibling::dd//*[@slot='output'])";
             this.profileIcon = "[class='uiImage']";
             this.logoutButton = "//a[text()='Log Out']";
             this.userNameInput = '#username';
@@ -96,11 +97,11 @@ exports.SFHomePage =
             const targetCountry = await this.page.locator(this.targetCountryField).innerText();
             expect(targetCountry).toContain(country);
         }
-        async clickOnContactDetails() {
+        async clickOnContactDetails(fullName) {
             await this.page.getByRole('tab', { name: 'Contact Details' }).waitFor({ state: 'visible' });
             await this.page.getByRole('tab', { name: 'Contact Details' }).click();
-            await this.page.getByRole('cell', { name: 'John Doe' }).waitFor({ state: 'visible' });
-            await this.page.getByRole('cell', { name: 'John Doe' }).click();
+            await this.page.getByRole('cell', { name: fullName }).waitFor({ state: 'visible' });
+            await this.page.getByRole('cell', { name: fullName }).click();
         }
         async clickOnLoginToExperienceAsUser() {
             await this.page.getByRole('button', { name: 'Log in to Experience as User' }).waitFor({ state: 'visible' });
@@ -108,10 +109,12 @@ exports.SFHomePage =
             await this.page.waitForLoadState('load');
         }
         async logoutAsAdmin() {
-            await this.page.waitForSelector(this.profileIcon, { state: 'visible' });
-            await this.page.click(this.profileIcon);
-            await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
-            await this.page.click(this.logoutButton);
+            // await this.page.waitForSelector(this.profileIcon, { state: 'visible' });
+            // await this.page.click(this.profileIcon);
+            // await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
+            // await this.page.click(this.logoutButton);
+            await this.page.waitForSelector(this.logoutUser, { state: 'visible' });
+            await this.page.click(this.logoutUser);
             await this.page.waitForSelector(this.userNameInput, { state: 'visible' });
             await this.page.close();
         }

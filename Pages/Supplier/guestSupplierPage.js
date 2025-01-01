@@ -54,6 +54,7 @@ export class guestSupplierPage {
         await this.page.fill(this.abnInput, abn);
     }
     async clickOnLookup() {
+        await this.page.locator(this.lookupButton).scrollIntoViewIfNeeded();
         await this.page.click(this.lookupButton);
     }
     async checkWarningMessage() {
@@ -74,7 +75,8 @@ export class guestSupplierPage {
         await this.page.waitForSelector(this.entityNameDropdown, { visible: true });
         await this.page.locator(this.entityNameDropdown).selectOption({ index: 1 });
         const entityNameDropdownValue = await this.page.locator(this.entityNameDropdownOption).textContent();
-        return entityNameDropdownValue;
+        const entityName = entityNameDropdownValue.replace(',', '');
+        return entityName;
     }
     async selectCompanyTradingName() {
         await this.page.waitForSelector(this.tradingNameDropdown, { visible: true });
@@ -132,6 +134,11 @@ export class guestSupplierPage {
     async clickOnSubmit() {
         await this.page.waitForSelector(this.submitButton, { visible: true });
         await this.page.click(this.submitButton);
+    }
+    async clickOnCaptchaCheckbox() {
+        const captchaFrame = this.page.frameLocator(this.captchaFrame);
+        // await captchaFrame.waitForSelector(this.captchaCheckbox, { visible: true });
+        await captchaFrame.locator(this.captchaCheckbox).click();
     }
     async verifySuccessMessage(expected_successMessage) {
         await this.page.waitForSelector(this.successMessage, { visible: true });

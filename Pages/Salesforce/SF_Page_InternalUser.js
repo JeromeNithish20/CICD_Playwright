@@ -17,7 +17,8 @@ export class SF_Page_InternalUser {
         this.showLess_btn = "//button[@title='Show Less']";
         this.grossMarginOk_btn = "//button[text()='OK']";
         //Case Fields
-        this.editCM_btn = "//button[@title='Edit Category Manager']";
+        this.editCM_btn = "(//slot//*[text()='$caseNo']/ancestor::records-record-layout-section)[2]/following-sibling::records-record-layout-section[1]//button[@title='Edit Category Manager']";
+        this.editCaseStatus_btn = "(//button[@title='Edit Status'])[2]";
         this.editMerchCategory_btn = "//button[@title='Edit Merchandise Category']";
         this.merchCategory_input = "input[placeholder='Search Composites...']";
         this.merchCategory_Dropdown_Option = "span [title='${merchCategory}']";
@@ -78,9 +79,10 @@ export class SF_Page_InternalUser {
             await this.page.click(this.showLess_btn);
         }
     }
-    async clickOnEditCM() {
-        await this.page.waitForSelector(this.editCM_btn, { state: 'visible' });
-        await this.page.click(this.editCM_btn);
+    async clickOnEditCM(caseNo) {
+        const editCM_btn = this.editCM_btn.replace("$caseNo", caseNo);
+        await this.page.waitForSelector(editCM_btn, { state: 'visible' });
+        await this.page.click(editCM_btn);
     }
     async clickOnEditMerchCategory() {
         await this.page.waitForSelector(this.editMerchCategory_btn, { state: 'visible' });
@@ -160,6 +162,7 @@ export class SF_Page_InternalUser {
         await this.page.waitForSelector(this.editCaseStatus_btn, { state: 'visible' });
     }
     async logoutAsInternalUser() {
+        await this.page.waitForSelector(this.logoutUser, { state: 'visible' });
         await this.page.click(this.logoutUser);
     }
 }
