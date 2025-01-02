@@ -1,7 +1,4 @@
-import { expect } from '@playwright/test';
-import { stat } from 'fs';
-exports.SFHomePage =
-    class SFHomePage {
+export class SFHomePage {
         constructor(page) {
             this.page = page;
             this.logoutUser = "a[class='action-link']";
@@ -25,14 +22,7 @@ exports.SFHomePage =
             this.tableRows = "tbody tr";
             this.accountNameLink = "//th/span/a[@title='${accountName}']";
             this.accountListViewLabel = 'Accounts||List View';
-            //Account Details
-            this.contactDetailsTab = "(//a[text()='Contact Details'])[2]";
-            this.abnNzbnField = "(//span[text()='ABN/NZBN']/../../following-sibling::dd//*[@slot='output'])";
-            this.accountNameField = "(//*[@data-field-id='RecordNameField']//lightning-formatted-text)[4]";
-            this.recordTypeField = "//span[text()='Record Type']/../../following-sibling::dd";
-            this.targetCountryField = "(//span[text()='Target Country']/../../following-sibling::dd//*[@slot='output'])";
-            this.profileIcon = "[class='uiImage']";
-            this.logoutButton = "//a[text()='Log Out']";
+
             this.userNameInput = '#username';
         }
         async verifyGrossMarginPopup() {
@@ -87,32 +77,8 @@ exports.SFHomePage =
             const accountLink = this.accountNameLink.replace("${accountName}", accountName);
             await this.page.locator(accountLink).waitFor({ state: 'visible' });
             await this.page.locator(accountLink).click();
-            // await this.page.getByRole('link', { name: accountName }).waitFor({ state: 'visible' });
-            // await this.page.getByRole('link', { name: accountName }).click();
-        }
-        async verifyAccountDetails(abn, country) {
-            await this.page.locator(this.abnNzbnField).waitFor({ state: 'visible' });
-            const abnNzbn = await this.page.locator(this.abnNzbnField).innerText();
-            expect(abnNzbn).toContain(abn);
-            const targetCountry = await this.page.locator(this.targetCountryField).innerText();
-            expect(targetCountry).toContain(country);
-        }
-        async clickOnContactDetails(fullName) {
-            await this.page.getByRole('tab', { name: 'Contact Details' }).waitFor({ state: 'visible' });
-            await this.page.getByRole('tab', { name: 'Contact Details' }).click();
-            await this.page.getByRole('cell', { name: fullName }).waitFor({ state: 'visible' });
-            await this.page.getByRole('cell', { name: fullName }).click();
-        }
-        async clickOnLoginToExperienceAsUser() {
-            await this.page.getByRole('button', { name: 'Log in to Experience as User' }).waitFor({ state: 'visible' });
-            await this.page.getByRole('button', { name: 'Log in to Experience as User' }).click();
-            await this.page.waitForLoadState('load');
         }
         async logoutAsAdmin() {
-            // await this.page.waitForSelector(this.profileIcon, { state: 'visible' });
-            // await this.page.click(this.profileIcon);
-            // await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
-            // await this.page.click(this.logoutButton);
             await this.page.waitForSelector(this.logoutUser, { state: 'visible' });
             await this.page.click(this.logoutUser);
             await this.page.waitForSelector(this.userNameInput, { state: 'visible' });

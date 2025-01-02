@@ -8,6 +8,7 @@ import { SFHomePage } from '../Pages/Salesforce/SFHomePage';
 import { SetupPage } from '../Pages/Salesforce/SetupPage';
 import { SF_Page_InternalUser } from '../Pages/Salesforce/SF_Page_InternalUser';
 import { SF_CasesPage } from '../Pages/Salesforce/SF_CasesPage';
+import { SF_AccountPage } from '../Pages/Salesforce/SF_AccountPage';
 import { generate12DigitGTIN } from '../utils/generate12DigitGTIN';
 import { getNextMonday } from '../utils/getNextMondayDate';
 import { generateRandomName } from '../utils/generateRandomName';
@@ -16,7 +17,7 @@ const fs = require('fs');
 const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
 test.setTimeout(300000);
 
-test.skip('Registering a New Supplier', async ({ page }) => {
+test('Registering a New Supplier', async ({ page }) => {
     const guest = new guestSupplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
         await guest.gotoSupplierPage();
@@ -74,7 +75,7 @@ test.skip('Registering a New Supplier', async ({ page }) => {
 
 });
 
-test.skip('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
+test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
     let page1;
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
@@ -86,18 +87,19 @@ test.skip('Logging in as Supplier and Initiating a New RRC', async ({ page }) =>
     await test.step('Navigate to Home', async () => {
         await home.gotoHome();
     });
+    const SF_AccountPage = new SF_AccountPage(page);
     await test.step('Navigate to Supplier Account and Verify Account Details', async () => {
         //Reading buffered value from previous test
         await home.searchAccount(buffer.entityValue);
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
-        await home.verifyAccountDetails(td.abn, td.country);
+        await SF_AccountPage.verifyAccountDetails(td.abn, td.country);
     });
     await test.step('Login as Supplier', async () => {
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await home.clickOnContactDetails(fullName);
+        await SF_AccountPage.clickOnContactDetails(fullName);
         await page.waitForLoadState('load');
-        await home.clickOnLoginToExperienceAsUser();
+        await SF_AccountPage.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
     await test.step('Select RRC', async () => {
@@ -181,7 +183,7 @@ test.skip('Logging in as Supplier and Initiating a New RRC', async ({ page }) =>
     });
 });
 
-test.skip('Updating CM and CA as BSS', async ({ page }) => {
+test('Updating CM and CA as BSS', async ({ page }) => {
     let page1;
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
@@ -305,12 +307,13 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
     });
+    const SF_AccountPage = new SF_AccountPage(page);
     await test.step('Verify Account Details', async () => {
         // await home.verifyAccountDetails(td.abn, td.country);
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await home.clickOnContactDetails(fullName);
+        await SF_AccountPage.clickOnContactDetails(fullName);
         await page.waitForLoadState('load');
-        await home.clickOnLoginToExperienceAsUser();
+        await SF_AccountPage.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
     const account = new AccountPage(page);
@@ -384,12 +387,13 @@ test('Logging in as CM and Making the Supplier Case Successful', async ({ page }
         await internalUser.clickOnCase(buffer.supplierCaseNo);
     });
     const SFCase = new SF_CasesPage(page1);
+    const SFAccount = new SF_AccountPage(page1);
     await test.step('Enter Search Term Details', async () => { 
         await SFCase.navigateToAccount(buffer.entityValue);
-        await SFCase.clickOnEditSearchTerm1();
-        await SFCase.enterSearchTerms(buffer.entityValue);
-        await SFCase.clickOnSave();
-        await SFCase.navigateBack();
+        await SFAccount.clickOnEditSearchTerm1();
+        await SFAccount.enterSearchTerms(buffer.entityValue);
+        await SFAccount.clickOnSave();
+        await SFAccount.navigateBack();
     });
     await test.step('Change Case Status', async () => {
         await SFCase.clickOnEditCaseStatus(buffer.supplierCaseNo);
@@ -439,17 +443,18 @@ test('Logging in as CA and Approving the Case', async ({ page }) => {
         await SFCase.changeCaseOwner_User(buffer.supplierCaseNo, td.categoryAssistant);
         await SFCase.clickOnSave();
     });
+    const SFAccount = new SF_AccountPage(page1);
     await test.step('Enter Trading Term Details', async () => {
         await SFCase.navigateToAccount(buffer.entityValue);
-        await SFCase.clickOnTradingTermTab();
-        await SFCase.openTradingTerm(buffer.tradingTermName);
-        await SFCase.clickOnEditRefVendor();
-        await SFCase.selectRefVendor(td.refVendor);
-        await SFCase.selectPaymentMethod();
-        await SFCase.selectPaymentTermsCode(td.paymentTermsCode);
-        await SFCase.clickOnSave();
-        await SFCase.navigateBack();
-        await SFCase.navigateBack();
+        await SFAccount.clickOnTradingTermTab();
+        await SFAccount.openTradingTerm(buffer.tradingTermName);
+        await SFAccount.clickOnEditRefVendor();
+        await SFAccount.selectRefVendor(td.refVendor);
+        await SFAccount.selectPaymentMethod();
+        await SFAccount.selectPaymentTermsCode(td.paymentTermsCode);
+        await SFAccount.clickOnSave();
+        await SFAccount.navigateBack();
+        await SFAccount.navigateBack();
     });
     await test.step('Change Case Status', async () => {
         await SFCase.clickOnEditCaseStatus(buffer.supplierCaseNo);
@@ -499,12 +504,13 @@ test('Logging in as BSS and Syncing the Case', async ({ page }) => {
         await SFCase.changeCaseOwner_User(buffer.supplierCaseNo, td.BSS_UserName);
         await SFCase.clickOnSave();
     });
+    const SFAccount = new SF_AccountPage(page1);
     await test.step('Assign Trading Term', async () => {
         await SFCase.navigateToAccount(buffer.entityValue);
-        await SFCase.clickOnEditTradingTerm();
-        await SFCase.enterTradingTerm(buffer.tradingTermName);
-        await SFCase.clickOnSave();
-        await SFCase.navigateBack();
+        await SFAccount.clickOnEditTradingTerm();
+        await SFAccount.enterTradingTerm(buffer.tradingTermName);
+        await SFAccount.clickOnSave();
+        await SFAccount.navigateBack();
     });
     await test.step('Change Case Status', async () => {
         await SFCase.clickOnShowMoreActions(buffer.supplierCaseNo);
@@ -514,7 +520,7 @@ test('Logging in as BSS and Syncing the Case', async ({ page }) => {
     });
     await test.step('Verify Vendor Number is Generated', async () => {
         await SFCase.navigateToAccount(buffer.entityValue);
-        const vendorNumber = await SFCase.verifyAndBufferVendorNumber();
+        const vendorNumber = await SFAccount.verifyAndBufferVendorNumber();
         buffer.vendorNumber = vendorNumber;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer, null, 2), 'utf8');
     });
@@ -543,11 +549,12 @@ test('Logging in as Supplier and Verifying Vendor Number', async ({ page }) => {
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
     });
+    const SF_AccountPage = new SF_AccountPage(page);
     await test.step('Navigate to Contact and Login', async () => {
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await home.clickOnContactDetails(fullName);
+        await SF_AccountPage.clickOnContactDetails(fullName);
         await page.waitForLoadState('load');
-        await home.clickOnLoginToExperienceAsUser();
+        await SF_AccountPage.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
     await test.step('Verify Vendor Number', async () => {
