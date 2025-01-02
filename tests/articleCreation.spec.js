@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../Pages/LoginPage';
-import { SFHomePage } from '../Pages/SFHomePage';
-import { CommunityPage } from '../Pages/CommunityPage';
+import { LoginPage } from '../Pages/Salesforce/LoginPage';
+import { SFHomePage } from '../Pages/Salesforce/SFHomePage';
+import { CommunityPage } from '../Pages/Supplier/CommunityPage';
 
 test.setTimeout(60000);
 

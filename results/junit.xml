@@ -1,10 +1,25 @@
-<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="82.56631200000015">
-<testsuite name="supplierOnboarding.spec.js" timestamp="2025-01-01T07:25:46.527Z" hostname="Google Chrome" tests="1" failures="0" skipped="0" time="79.064" errors="0">
-<testcase name="Logging in as BSS and Syncing the Case" classname="supplierOnboarding.spec.js" time="79.064">
-<system-out>
-<![CDATA[Vendor Number: 0011909001
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="8.109274000000001">
+<testsuite name="supplierOnboarding.spec.js" timestamp="2025-01-02T05:59:59.522Z" hostname="Google Chrome" tests="1" failures="1" skipped="0" time="4.277" errors="0">
+<testcase name="Logging in as Supplier and Verifying Vendor Number" classname="supplierOnboarding.spec.js" time="4.277">
+<failure message="supplierOnboarding.spec.js:529:5 Logging in as Supplier and Verifying Vendor Number" type="FAILURE">
+<![CDATA[  [Google Chrome] › supplierOnboarding.spec.js:529:5 › Logging in as Supplier and Verifying Vendor Number › Login as Admin 
+
+    Error: page.click: Target page, context or browser has been closed
+
+       at ..\Pages\Salesforce\LoginPage.js:21
+
+      19 |             await this.page.fill(this.passwordInput, password);
+      20 |             await this.page.click(this.loginButton);
+    > 21 |             await this.page.click(this.agreeButton);
+         |                             ^
+      22 |             await this.page.waitForLoadState('load');
+      23 |         }
+      24 |     }
+        at LoginPage.login (C:\Users\1361953\PlaywrightWithJS\Pages\Salesforce\LoginPage.js:21:29)
+        at C:\Users\1361953\PlaywrightWithJS\tests\supplierOnboarding.spec.js:533:9
+        at C:\Users\1361953\PlaywrightWithJS\tests\supplierOnboarding.spec.js:530:5
 ]]>
-</system-out>
+</failure>
 </testcase>
 </testsuite>
 </testsuites>

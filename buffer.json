@@ -1,9 +1,9 @@
 {
-  "firstName": "James",
-  "lastName": "Garcia",
-  "bufferedEntityValue": "GROCERY EZY PTY LTD",
-  "bufferedSupplierCaseNo": "03333499",
-  "bufferedArticleCaseNo": "03333500",
-  "bufferedTradingTermName": "Trading Terms 2712",
-  "bufferedVendorNumber": "0011909001"
+  "firstName": "Chris",
+  "lastName": "Martinez",
+  "entityValue": "GROCERY MART PTY LTD",
+  "supplierCaseNo": "03333503",
+  "articleCaseNo": "03333504",
+  "tradingTermName": "Trading Terms 2713",
+  "vendorNumber": "0011910001"
 }

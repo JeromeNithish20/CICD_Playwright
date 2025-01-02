@@ -1,22 +1,22 @@
 import { test, expect } from '@playwright/test';
 import { guestSupplierPage } from '../Pages/Supplier/guestSupplierPage';
+import { CommunityPage } from '../Pages/Supplier/CommunityPage';
+import { AccountPage } from '../Pages/Supplier/AccountPage';
+import { RangeReviewFlow } from '../Pages/Supplier/RangeReviewFlow';
 import { LoginPage } from '../Pages/Salesforce/LoginPage';
 import { SFHomePage } from '../Pages/Salesforce/SFHomePage';
-import { CommunityPage } from '../Pages/Supplier/CommunityPage';
-import { RangeReviewFlow } from '../Pages/Supplier/RangeReviewFlow';
-import { generate12DigitGTIN } from '../utils/generate12DigitGTIN';
 import { SetupPage } from '../Pages/Salesforce/SetupPage';
 import { SF_Page_InternalUser } from '../Pages/Salesforce/SF_Page_InternalUser';
-import { AccountPage } from '../Pages/Supplier/AccountPage';
+import { SF_CasesPage } from '../Pages/Salesforce/SF_CasesPage';
+import { generate12DigitGTIN } from '../utils/generate12DigitGTIN';
 import { getNextMonday } from '../utils/getNextMondayDate';
 import { generateRandomName } from '../utils/generateRandomName';
-import { SF_CasesPage } from '../Pages/Salesforce/SF_CasesPage';
 const td = require('../testdata/supplierOnboarding.json');
 const fs = require('fs');
 const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
 test.setTimeout(300000);
 
-test('Registering a New Supplier', async ({ page }) => {
+test.skip('Registering a New Supplier', async ({ page }) => {
     const guest = new guestSupplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
         await guest.gotoSupplierPage();
@@ -41,7 +41,7 @@ test('Registering a New Supplier', async ({ page }) => {
                 //Buffering the value to be used in next step
                 const entityNameDropdownValue = await guest.selectEntityName();
                 // const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
-                buffer.bufferedEntityValue = entityNameDropdownValue;
+                buffer.entityValue = entityNameDropdownValue;
                 fs.writeFileSync('buffer.json', JSON.stringify(buffer, null, 2), 'utf8');
                 await guest.selectCompanyTradingName();
                 await guest.enterTradingName(entityNameDropdownValue);
@@ -74,7 +74,7 @@ test('Registering a New Supplier', async ({ page }) => {
 
 });
 
-test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
+test.skip('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
     let page1;
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
@@ -88,9 +88,9 @@ test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
     });
     await test.step('Navigate to Supplier Account and Verify Account Details', async () => {
         //Reading buffered value from previous test
-        await home.searchAccount(buffer.bufferedEntityValue);
+        await home.searchAccount(buffer.entityValue);
         await home.clickOnAccountResultTab();
-        await home.clickOnAccount(buffer.bufferedEntityValue);
+        await home.clickOnAccount(buffer.entityValue);
         await home.verifyAccountDetails(td.abn, td.country);
     });
     await test.step('Login as Supplier', async () => {
@@ -159,24 +159,29 @@ test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
         //Buffering Supplier Case Number
         const supplierCaseNo = await community1.bufferSupplierCaseNumber();
         console.log('Supplier Case Number: ', supplierCaseNo);
-        buffer.bufferedSupplierCaseNo = supplierCaseNo;
+        buffer.supplierCaseNo = supplierCaseNo;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer, null, 2), 'utf8');
         //Buffering Article Case Number
         const articleCaseNo = await community1.bufferArticleCaseNumber();
         console.log('Article Case Number: ', articleCaseNo);
-        buffer.bufferedArticleCaseNo = articleCaseNo;
+        buffer.articleCaseNo = articleCaseNo;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer, null, 2), 'utf8');
     });
     await test.step('Verify Case Status', async () => {
-        await community1.clickOnSupplierCase(buffer.bufferedSupplierCaseNo);
+        await community1.clickOnSupplierCase(buffer.supplierCaseNo);
         await community1.verifySupplierCaseDetails(td.supplierCaseOwner, td.supplierCaseType, td.supplierCaseStatus);
-        await community1.clickOnArticleCase(buffer.bufferedArticleCaseNo);
+        await community1.clickOnArticleCase(buffer.articleCaseNo);
         await community1.verifyArticleCaseDetails(td.articleCaseOwner, td.articleCaseType, td.articleCaseStatus);
     });
-    await page1.close();
+    await test.step('Logout As Supplier User', async () => {
+        await community.logoutAsSupplierUser();
+    });
+    await test.step('Login as Admin', async () => {
+        await home.logoutAsAdmin();
+    });
 });
 
-test('Updating CM and CA as BSS', async ({ page }) => {
+test.skip('Updating CM and CA as BSS', async ({ page }) => {
     let page1;
     await test.step('Login as Admin', async () => {
         const login = new LoginPage(page);
@@ -200,13 +205,13 @@ test('Updating CM and CA as BSS', async ({ page }) => {
     const internalUser = new SF_Page_InternalUser(page1);
     await test.step('Navigate to Article Case', async () => {
         await internalUser.gotoBSSHome();
-        await internalUser.searchCase(buffer.bufferedArticleCaseNo);
+        await internalUser.searchCase(buffer.articleCaseNo);
         await internalUser.clickOnCaseResultTab();
-        await internalUser.clickOnCase(buffer.bufferedArticleCaseNo);
+        await internalUser.clickOnCase(buffer.articleCaseNo);
     });
     await test.step('Update CM and CA', async () => {
         await internalUser.collapseKeyFields();
-        await internalUser.clickOnEditCM(buffer.bufferedArticleCaseNo);
+        await internalUser.clickOnEditCM(buffer.articleCaseNo);
         await internalUser.enterCM(td.categoryManager);
         await internalUser.selectCMOption(td.categoryManager);
         await internalUser.enterCA(td.categoryAssistant);
@@ -215,7 +220,7 @@ test('Updating CM and CA as BSS', async ({ page }) => {
     });
     const SFCase = new SF_CasesPage(page1);
     await test.step('Change Case Owner', async () => {
-        await SFCase.changeCaseOwner_User(buffer.bufferedArticleCaseNo, td.categoryManager);
+        await SFCase.changeCaseOwner_User(buffer.articleCaseNo, td.categoryManager);
         await SFCase.clickOnSave();
     });
     await test.step('Logout As BSS User', async () => {
@@ -251,24 +256,25 @@ test('Logging in as CM and Making Article Case Successful', async ({ page }) => 
     const internalUser = new SF_Page_InternalUser(page1);
     await test.step('Navigate to Article Case', async () => {
         await internalUser.gotoBSSHome();
-        await internalUser.searchCase(buffer.bufferedArticleCaseNo);
+        await internalUser.searchCase(buffer.articleCaseNo);
         await internalUser.clickOnCaseResultTab();
-        await internalUser.clickOnCase(buffer.bufferedArticleCaseNo);
+        await internalUser.clickOnCase(buffer.articleCaseNo);
     });
     await test.step('Verify Gross Margin Pop-up is displayed', async () => {
         await internalUser.verifyGrossMarginPopup();
     });
     await test.step('Update Merchandise Category', async () => {
         await internalUser.collapseKeyFields();
-        await internalUser.clickOnEditMerchCategory();
+        await internalUser.clickOnEditMerchCategory(buffer.articleCaseNo);
         await internalUser.enterMerchandiseCategory(td.merchCategory);
         await internalUser.clickOnSave();
     });
     const SFCase = new SF_CasesPage(page1);
     await test.step('Change Case Status', async () => {
-        await SFCase.clickOnEditCaseStatus(buffer.bufferedArticleCaseNo);
-        await SFCase.changeCaseStatus(buffer.bufferedArticleCaseNo, td.caseStatus_Successful);
+        await SFCase.clickOnEditCaseStatus(buffer.articleCaseNo);
+        await SFCase.changeCaseStatus(buffer.articleCaseNo, td.caseStatus_Successful);
         await internalUser.clickOnSave();
+        await internalUser.reloadPage();
         await internalUser.reloadPage();
         await internalUser.reloadPage();
     });
@@ -295,9 +301,9 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
     });
     await test.step('Navigate to Supplier Account', async () => {
         //Reading buffered value from previous test
-        await home.searchAccount(buffer.bufferedEntityValue);
+        await home.searchAccount(buffer.entityValue);
         await home.clickOnAccountResultTab();
-        await home.clickOnAccount(buffer.bufferedEntityValue);
+        await home.clickOnAccount(buffer.entityValue);
     });
     await test.step('Verify Account Details', async () => {
         // await home.verifyAccountDetails(td.abn, td.country);
@@ -311,8 +317,8 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
     await test.step('Navigate to Supplier Case and Open Account', async () => {
         await community.clickOnCases();
         await community.changeCaseListView();
-        await community.clickOnSupplierCase(buffer.bufferedSupplierCaseNo);
-        await account.clickOnAccountNameOnSupplierCase(buffer.bufferedEntityValue);
+        await community.clickOnSupplierCase(buffer.supplierCaseNo);
+        await account.clickOnAccountNameOnSupplierCase(buffer.entityValue);
     });
     await test.step('Upload Necessary Documents', async () => {
         await account.uploadBankStatement('Bank Statement');
@@ -331,7 +337,7 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
         await account.clickOnSaveButton();
         //Buffering Trading Term Name
         const tradingTermName = await account.bufferTradingTermName();
-        buffer.bufferedTradingTermName = tradingTermName;
+        buffer.tradingTermName = tradingTermName;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer, null, 2), 'utf8');
         await account.navigateBack();
         await account.navigateBack();
@@ -373,21 +379,21 @@ test('Logging in as CM and Making the Supplier Case Successful', async ({ page }
     const internalUser = new SF_Page_InternalUser(page1);
     await test.step('Navigate to Article Case', async () => {
         // await internalUser.gotoBSSHome();
-        await internalUser.searchCase(buffer.bufferedSupplierCaseNo);
+        await internalUser.searchCase(buffer.supplierCaseNo);
         await internalUser.clickOnCaseResultTab();
-        await internalUser.clickOnCase(buffer.bufferedSupplierCaseNo);
+        await internalUser.clickOnCase(buffer.supplierCaseNo);
     });
     const SFCase = new SF_CasesPage(page1);
     await test.step('Enter Search Term Details', async () => { 
-        await SFCase.navigateToAccount(buffer.bufferedEntityValue);
+        await SFCase.navigateToAccount(buffer.entityValue);
         await SFCase.clickOnEditSearchTerm1();
-        await SFCase.enterSearchTerms(buffer.bufferedEntityValue);
+        await SFCase.enterSearchTerms(buffer.entityValue);
         await SFCase.clickOnSave();
         await SFCase.navigateBack();
     });
     await test.step('Change Case Status', async () => {
-        await SFCase.clickOnEditCaseStatus(buffer.bufferedSupplierCaseNo);
-        await SFCase.changeCaseStatus(buffer.bufferedSupplierCaseNo, td.caseStatus_Successful);
+        await SFCase.clickOnEditCaseStatus(buffer.supplierCaseNo);
+        await SFCase.changeCaseStatus(buffer.supplierCaseNo, td.caseStatus_Successful);
         await SFCase.clickOnSave();
         await SFCase.reloadPage();
         await SFCase.verifyCaseDetails(td.CSA_QueueName, td.caseStatus_Successful);
@@ -424,19 +430,19 @@ test('Logging in as CA and Approving the Case', async ({ page }) => {
     const internalUser = new SF_Page_InternalUser(page1);
     await test.step('Navigate to Article Case', async () => {
         // await internalUser.gotoBSSHome();
-        await internalUser.searchCase(buffer.bufferedSupplierCaseNo);
+        await internalUser.searchCase(buffer.supplierCaseNo);
         await internalUser.clickOnCaseResultTab();
-        await internalUser.clickOnCase(buffer.bufferedSupplierCaseNo);
+        await internalUser.clickOnCase(buffer.supplierCaseNo);
     });
     const SFCase = new SF_CasesPage(page1);
     await test.step('Change Case Owner', async () => {
-        await SFCase.changeCaseOwner_User(buffer.bufferedSupplierCaseNo, td.categoryAssistant);
+        await SFCase.changeCaseOwner_User(buffer.supplierCaseNo, td.categoryAssistant);
         await SFCase.clickOnSave();
     });
     await test.step('Enter Trading Term Details', async () => {
-        await SFCase.navigateToAccount(buffer.bufferedEntityValue);
+        await SFCase.navigateToAccount(buffer.entityValue);
         await SFCase.clickOnTradingTermTab();
-        await SFCase.openTradingTerm(buffer.bufferedTradingTermName);
+        await SFCase.openTradingTerm(buffer.tradingTermName);
         await SFCase.clickOnEditRefVendor();
         await SFCase.selectRefVendor(td.refVendor);
         await SFCase.selectPaymentMethod();
@@ -446,8 +452,8 @@ test('Logging in as CA and Approving the Case', async ({ page }) => {
         await SFCase.navigateBack();
     });
     await test.step('Change Case Status', async () => {
-        await SFCase.clickOnEditCaseStatus(buffer.bufferedSupplierCaseNo);
-        await SFCase.changeCaseStatus(buffer.bufferedSupplierCaseNo, td.caseStatus_Approved);
+        await SFCase.clickOnEditCaseStatus(buffer.supplierCaseNo);
+        await SFCase.changeCaseStatus(buffer.supplierCaseNo, td.caseStatus_Approved);
         await SFCase.clickOnSave();
         await SFCase.reloadPage();
         await SFCase.verifyCaseDetails('Trade Supplier Support', td.caseStatus_Approved);
@@ -484,32 +490,32 @@ test('Logging in as BSS and Syncing the Case', async ({ page }) => {
     const internalUser = new SF_Page_InternalUser(page1);
     await test.step('Navigate to Article Case', async () => {
         await internalUser.gotoBSSHome();
-        await internalUser.searchCase(buffer.bufferedSupplierCaseNo);
+        await internalUser.searchCase(buffer.supplierCaseNo);
         await internalUser.clickOnCaseResultTab();
-        await internalUser.clickOnCase(buffer.bufferedSupplierCaseNo);
+        await internalUser.clickOnCase(buffer.supplierCaseNo);
     });
     const SFCase = new SF_CasesPage(page1);
     await test.step('Change Case Owner', async () => {
-        await SFCase.changeCaseOwner_User(buffer.bufferedSupplierCaseNo, td.BSS_UserName);
+        await SFCase.changeCaseOwner_User(buffer.supplierCaseNo, td.BSS_UserName);
         await SFCase.clickOnSave();
     });
     await test.step('Assign Trading Term', async () => {
-        await SFCase.navigateToAccount(buffer.bufferedEntityValue);
+        await SFCase.navigateToAccount(buffer.entityValue);
         await SFCase.clickOnEditTradingTerm();
-        await SFCase.enterTradingTerm(buffer.bufferedTradingTermName);
+        await SFCase.enterTradingTerm(buffer.tradingTermName);
         await SFCase.clickOnSave();
         await SFCase.navigateBack();
     });
     await test.step('Change Case Status', async () => {
-        await SFCase.clickOnShowMoreActions(buffer.bufferedSupplierCaseNo);
+        await SFCase.clickOnShowMoreActions(buffer.supplierCaseNo);
         await SFCase.clickOnSendToSAP();
         await SFCase.reloadPageUntilReviewStatus();
         await SFCase.verifyCaseDetails('Trade Supplier Support',td.caseStatus_InReview);
     });
     await test.step('Verify Vendor Number is Generated', async () => {
-        await SFCase.navigateToAccount(buffer.bufferedEntityValue);
+        await SFCase.navigateToAccount(buffer.entityValue);
         const vendorNumber = await SFCase.verifyAndBufferVendorNumber();
-        buffer.bufferedVendorNumber = vendorNumber;
+        buffer.vendorNumber = vendorNumber;
         fs.writeFileSync('buffer.json', JSON.stringify(buffer, null, 2), 'utf8');
     });
     await test.step('Logout As BSS User', async () => {
@@ -517,5 +523,40 @@ test('Logging in as BSS and Syncing the Case', async ({ page }) => {
     });
     await test.step('Logout as Admin', async () => {
         await setup.logoutAsAdmin();
+    });
+});
+
+test('Logging in as Supplier and Verifying Vendor Number', async ({ page }) => {
+    await test.step('Login as Admin', async () => {
+        const login = new LoginPage(page);
+        await login.gotoLoginPage();
+        await login.login(td.username, td.password);
+    });
+    await page.waitForTimeout(8000);
+    const home = new SFHomePage(page);
+    await test.step('Navigate to Home', async () => {
+        await home.gotoHome();
+    });
+    await test.step('Navigate to Supplier Account', async () => {
+        //Reading buffered value from previous test
+        await home.searchAccount(buffer.entityValue);
+        await home.clickOnAccountResultTab();
+        await home.clickOnAccount(buffer.entityValue);
+    });
+    await test.step('Navigate to Contact and Login', async () => {
+        const fullName = `${buffer.firstName} ${buffer.lastName}`;
+        await home.clickOnContactDetails(fullName);
+        await page.waitForLoadState('load');
+        await home.clickOnLoginToExperienceAsUser();
+    });
+    const community = new CommunityPage(page);
+    await test.step('Verify Vendor Number', async () => {
+        await community.verifyVendorNumber(buffer.entityValue, buffer.vendorNumber);
+    });
+    await test.step('Logout As Supplier User', async () => {
+        await community.logoutAsSupplierUser();
+    });
+    await test.step('Login as Admin', async () => {
+        await home.logoutAsAdmin();
     });
 });

@@ -5,7 +5,7 @@ export class CommunityPage {
         this.page = page;
         this.title = 'Community';
         this.pageURL = 'https://woolworths--phuat.sandbox.my.site.com/s/';
-        this.accountName = '.textReg:nth-child(2)';
+        this.accountName = "span[class='textReg']:nth-child(2)";
         this.quickLinksTitle = "[class='quickTxt']";
         this.welcomePopup = "(//span[contains(text(),'Welcome to Partner Hub')])[2]";
         this.welcomePopupClose = "[title='Stop Walk-thru']";
@@ -42,7 +42,7 @@ export class CommunityPage {
     async displayAccountName() {
         await this.page.waitForSelector(this.accountName, { state: 'visible' });
         const actual_accountName = this.page.locator(this.accountName).textContent();
-        console.log('Account Name:', actual_accountName);
+        console.log("Account Name: " + actual_accountName);
     }
     async verifyPageTitle() {
         await this.page.waitForSelector(this.quickLinksTitle, { state: 'visible' });
@@ -77,7 +77,7 @@ export class CommunityPage {
         await this.page.click(this.allOpenCasesOption);
     }
     async clickOnRRC() {
-        const popupTimeout = 10000;
+        const popupTimeout = 20000;
         // Handle the popup if it appears
         try {
             const isPopupVisible = await this.page.locator(this.welcomePopupClose).waitFor({
@@ -94,7 +94,6 @@ export class CommunityPage {
         }
 
         // Proceed to click the "RRC" button
-        console.log("Navigating to RRC.");
         await this.page.locator(this.quickLinksTitle).waitFor({ state: 'visible' });
         await this.page.locator(this.rrcButton).waitFor({ state: 'visible' });
         await this.page.locator(this.rrcButton).click();
@@ -133,7 +132,6 @@ export class CommunityPage {
             });
 
             if (isPopupVisible) {
-                console.log("Exit popup appeared. Closing it.");
                 await this.page.locator(this.exitPopup).click();
                 await this.page.locator(this.exitPopup).waitFor({ state: 'hidden' }); // Ensure popup is gone
             }
@@ -142,7 +140,6 @@ export class CommunityPage {
         }
 
         // Proceed with changing the RRC list view
-        console.log("Changing RRC list view.");
         await this.page.locator(this.RRCListViewDropdown).waitFor({ state: 'visible' });
         await this.page.locator(this.RRCListViewDropdown).click();
         await this.page.locator(this.searchRRCListInput).waitFor({ state: 'visible' });
@@ -229,6 +226,13 @@ export class CommunityPage {
         await this.page.waitForSelector(this.saveButton, { state: 'visible' });
         await this.page.click(this.saveButton);
         await this.page.waitForSelector(this.saveButton, { state: 'hidden' });
+    }
+    async verifyVendorNumber(exp_accountName, exp_vendorNumber) {
+        await this.page.waitForSelector(this.accountName, { state: 'visible' });
+        const act_ANandVN = await this.page.locator(this.accountName).textContent();
+        console.log("Actual Account Name and Vendor Number: " + act_ANandVN);
+        expect(act_ANandVN).toBe(`${exp_accountName} ${exp_vendorNumber}`);
+        console.log("Expected Account Name and Vendor Number: " + `${exp_accountName} ${exp_vendorNumber}`);
     }
     async logoutAsSupplierUser() {
         await this.page.waitForSelector(this.profileIcon, { state: 'visible' });

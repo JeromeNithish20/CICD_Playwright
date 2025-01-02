@@ -19,7 +19,7 @@ export class SF_Page_InternalUser {
         //Case Fields
         this.editCM_btn = "(//slot//*[text()='$caseNo']/ancestor::records-record-layout-section)[2]/following-sibling::records-record-layout-section[1]//button[@title='Edit Category Manager']";
         this.editCaseStatus_btn = "(//button[@title='Edit Status'])[2]";
-        this.editMerchCategory_btn = "//button[@title='Edit Merchandise Category']";
+        this.editMerchCategory_btn = "(//slot//*[text()='$caseNo']/ancestor::records-record-layout-section)[2]/following-sibling::records-record-layout-section[1]//button[@title='Edit Merchandise Category']";
         this.merchCategory_input = "input[placeholder='Search Composites...']";
         this.merchCategory_Dropdown_Option = "span [title='${merchCategory}']";
         this.clearCM = "//label[text()='Category Manager']/following-sibling::div//button";
@@ -84,9 +84,10 @@ export class SF_Page_InternalUser {
         await this.page.waitForSelector(editCM_btn, { state: 'visible' });
         await this.page.click(editCM_btn);
     }
-    async clickOnEditMerchCategory() {
-        await this.page.waitForSelector(this.editMerchCategory_btn, { state: 'visible' });
-        await this.page.click(this.editMerchCategory_btn);
+    async clickOnEditMerchCategory(caseNo) {
+        const editMerchCategory_btn = this.editMerchCategory_btn.replace("$caseNo", caseNo);
+        await this.page.waitForSelector(editMerchCategory_btn, { state: 'visible' });
+        await this.page.click(editMerchCategory_btn);
     }
     async enterMerchandiseCategory(merchCategory) {
         const merchCategory_inputBox = await this.page.locator(this.merchCategory_input);
