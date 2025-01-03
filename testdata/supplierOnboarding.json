@@ -3,7 +3,7 @@
     "password": "Tcs@1234",
 
     "pageName": "Supplier Onboarding",
-    "abn": "45657091499",
+    "abn": "99680831136",
     "tradingName": "The Sorbent Paper Co",
     "country": "Australia",
     "street": "1 Woolworths Way",
@@ -12,7 +12,7 @@
     "firstName": "John",
     "lastName": "Doe",
     "jobTitle": "Manager",
-    "email": "test6@woolworths.com.au.invalid",
+    "email": "test7@woolworths.com.au.invalid",
     "contactNumber": "0412345678",
     "expected_successMessage": "Your registration with Partner Hub is successful. Please check your email for the login details.",
     

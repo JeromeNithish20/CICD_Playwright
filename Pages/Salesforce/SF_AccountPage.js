@@ -1,5 +1,7 @@
+import { expect } from '@playwright/test';
 export class SF_AccountPage {
-    constructor() {
+    constructor(page) {
+        this.page = page;
         //Highlight Panel
         this.vendorNumber = "//p[@title='Vendor Number']/following-sibling::p/slot/*";
         this.businessUnit = "//p[@title='Business Organization']/following-sibling::p/slot/*";
@@ -26,14 +28,14 @@ export class SF_AccountPage {
         this.paymentTermsCodeOption = "span[title='${paymentTermsCode}']";
         this.saveButton = "//button[@name='SaveEdit']";
     }
-    async verifyAccountDetails(abn, country) {
+    async verifyAccountDetails(exp_abn, exp_country) {
         await this.page.locator(this.abnNzbnField).waitFor({ state: 'visible' });
-        const abnNzbn = await this.page.locator(this.abnNzbnField).innerText();
-        expect(abnNzbn).toContain(abn);
-        const recordType = await this.page.locator(this.recordTypeField).innerText();
-        expect(recordType).toContain('Supplier');
-        const targetCountry = await this.page.locator(this.targetCountryField).innerText();
-        expect(targetCountry).toContain(country);
+        const act_abnNzbn = await this.page.locator(this.abnNzbnField).innerText();
+        expect(act_abnNzbn).toContain(exp_abn);
+        const act_recordType = await this.page.locator(this.recordTypeField).innerText();
+        expect(act_recordType).toContain('Supplier');
+        const act_targetCountry = await this.page.locator(this.targetCountryField).innerText();
+        expect(act_targetCountry).toContain(exp_country);
     }
     async clickOnContactDetails(fullName) {
         await this.page.getByRole('tab', { name: 'Contact Details' }).waitFor({ state: 'visible' });

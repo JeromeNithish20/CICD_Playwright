@@ -78,7 +78,7 @@
       "specs": [
         {
           "title": "Logging in as Supplier and Verifying Vendor Number",
-          "ok": false,
+          "ok": true,
           "tags": [],
           "tests": [
             {
@@ -89,63 +89,60 @@
               "projectName": "Google Chrome",
               "results": [
                 {
-                  "workerIndex": 0,
-                  "status": "failed",
-                  "duration": 4277,
-                  "error": {
-                    "message": "Error: page.click: Target page, context or browser has been closed",
-                    "stack": "Error: page.click: Target page, context or browser has been closed\n    at LoginPage.login (C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js:21:29)\n    at C:\\Users\\1361953\\PlaywrightWithJS\\tests\\supplierOnboarding.spec.js:533:9\n    at C:\\Users\\1361953\\PlaywrightWithJS\\tests\\supplierOnboarding.spec.js:530:5",
-                    "location": {
-                      "file": "C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js",
-                      "column": 29,
-                      "line": 21
-                    },
-                    "snippet": "\u001b[90m   at \u001b[39m..\\Pages\\Salesforce\\LoginPage.js:21\n\n\u001b[0m \u001b[90m 19 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mfill(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpasswordInput\u001b[33m,\u001b[39m password)\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mclick(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mloginButton)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mclick(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39magreeButton)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'load'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m         }\n \u001b[90m 24 |\u001b[39m     }\u001b[0m"
-                  },
-                  "errors": [
+                  "workerIndex": 13,
+                  "status": "passed",
+                  "duration": 47308,
+                  "errors": [],
+                  "stdout": [
                     {
-                      "location": {
-                        "file": "C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js",
-                        "column": 29,
-                        "line": 21
-                      },
-                      "message": "Error: page.click: Target page, context or browser has been closed\n\n\u001b[90m   at \u001b[39m..\\Pages\\Salesforce\\LoginPage.js:21\n\n\u001b[0m \u001b[90m 19 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mfill(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpasswordInput\u001b[33m,\u001b[39m password)\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mclick(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mloginButton)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mclick(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39magreeButton)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'load'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m         }\n \u001b[90m 24 |\u001b[39m     }\u001b[0m\n\u001b[2m    at LoginPage.login (C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js:21:29)\u001b[22m\n\u001b[2m    at C:\\Users\\1361953\\PlaywrightWithJS\\tests\\supplierOnboarding.spec.js:533:9\u001b[22m\n\u001b[2m    at C:\\Users\\1361953\\PlaywrightWithJS\\tests\\supplierOnboarding.spec.js:530:5\u001b[22m"
+                      "text": "Actual Account Name and Vendor Number: GROCERY EXPRESS PTY LTD 0011911001\n"
+                    },
+                    {
+                      "text": "Expected Account Name and Vendor Number: GROCERY EXPRESS PTY LTD 0011911001\n"
                     }
                   ],
-                  "stdout": [],
                   "stderr": [],
                   "retry": 0,
                   "steps": [
                     {
                       "title": "Login as Admin",
-                      "duration": 2872,
-                      "error": {
-                        "message": "Error: page.click: Target page, context or browser has been closed",
-                        "stack": "Error: page.click: Target page, context or browser has been closed\n    at LoginPage.login (C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js:21:29)\n    at C:\\Users\\1361953\\PlaywrightWithJS\\tests\\supplierOnboarding.spec.js:533:9\n    at C:\\Users\\1361953\\PlaywrightWithJS\\tests\\supplierOnboarding.spec.js:530:5",
-                        "location": {
-                          "file": "C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js",
-                          "column": 29,
-                          "line": 21
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39m..\\Pages\\Salesforce\\LoginPage.js:21\n\n\u001b[0m \u001b[90m 19 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mfill(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpasswordInput\u001b[33m,\u001b[39m password)\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mclick(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mloginButton)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mclick(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39magreeButton)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m             \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'load'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m         }\n \u001b[90m 24 |\u001b[39m     }\u001b[0m"
-                      }
+                      "duration": 7157
+                    },
+                    {
+                      "title": "Navigate to Home",
+                      "duration": 1697
+                    },
+                    {
+                      "title": "Navigate to Supplier Account",
+                      "duration": 4442
+                    },
+                    {
+                      "title": "Navigate to Contact and Login",
+                      "duration": 1850
+                    },
+                    {
+                      "title": "Verify Vendor Number",
+                      "duration": 12126
+                    },
+                    {
+                      "title": "Logout As Supplier User",
+                      "duration": 4078
+                    },
+                    {
+                      "title": "Logout as Admin",
+                      "duration": 6082
                     }
                   ],
-                  "startTime": "2025-01-02T06:00:00.966Z",
-                  "attachments": [],
-                  "errorLocation": {
-                    "file": "C:\\Users\\1361953\\PlaywrightWithJS\\Pages\\Salesforce\\LoginPage.js",
-                    "column": 29,
-                    "line": 21
-                  }
+                  "startTime": "2025-01-03T06:37:00.376Z",
+                  "attachments": []
                 }
               ],
-              "status": "unexpected"
+              "status": "expected"
             }
           ],
           "id": "be7d53323ec8615edfcf-b1d27c132c40d9a80221",
           "file": "supplierOnboarding.spec.js",
-          "line": 529,
+          "line": 535,
           "column": 5
         }
       ]
@@ -153,11 +150,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-01-02T05:59:58.214Z",
-    "duration": 8109.274000000001,
-    "expected": 0,
+    "startTime": "2025-01-03T06:36:57.549Z",
+    "duration": 51252.564999999944,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

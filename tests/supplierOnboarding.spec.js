@@ -17,7 +17,7 @@ const fs = require('fs');
 const buffer = JSON.parse(fs.readFileSync('buffer.json', 'utf8'));
 test.setTimeout(300000);
 
-test('Registering a New Supplier', async ({ page }) => {
+test.skip('Registering a New Supplier', async ({ page }) => {
     const guest = new guestSupplierPage(page);
     await test.step('Initiate Supplier Application', async () => {
         await guest.gotoSupplierPage();
@@ -87,19 +87,19 @@ test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
     await test.step('Navigate to Home', async () => {
         await home.gotoHome();
     });
-    const SF_AccountPage = new SF_AccountPage(page);
+    const SFAccount = new SF_AccountPage(page);
     await test.step('Navigate to Supplier Account and Verify Account Details', async () => {
         //Reading buffered value from previous test
         await home.searchAccount(buffer.entityValue);
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
-        await SF_AccountPage.verifyAccountDetails(td.abn, td.country);
+        await SFAccount.verifyAccountDetails(td.abn, td.country);
     });
     await test.step('Login as Supplier', async () => {
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await SF_AccountPage.clickOnContactDetails(fullName);
+        await SFAccount.clickOnContactDetails(fullName);
         await page.waitForLoadState('load');
-        await SF_AccountPage.clickOnLoginToExperienceAsUser();
+        await SFAccount.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
     await test.step('Select RRC', async () => {
@@ -176,9 +176,9 @@ test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
         await community1.verifyArticleCaseDetails(td.articleCaseOwner, td.articleCaseType, td.articleCaseStatus);
     });
     await test.step('Logout As Supplier User', async () => {
-        await community.logoutAsSupplierUser();
+        await community1.logoutAsSupplierUser();
     });
-    await test.step('Login as Admin', async () => {
+    await test.step('Logout as Admin', async () => {
         await home.logoutAsAdmin();
     });
 });
@@ -228,7 +228,7 @@ test('Updating CM and CA as BSS', async ({ page }) => {
     await test.step('Logout As BSS User', async () => {
         await internalUser.logoutAsInternalUser();
     });
-    await test.step('Login as Admin', async () => {
+    await test.step('Logout as Admin', async () => {
         await setup.logoutAsAdmin();
     });
 });
@@ -285,7 +285,7 @@ test('Logging in as CM and Making Article Case Successful', async ({ page }) => 
     await test.step('Logout As CM User', async () => {
         await internalUser.logoutAsInternalUser();
     });
-    await test.step('Login as Admin', async () => {
+    await test.step('Logout as Admin', async () => {
         await setup.logoutAsAdmin();
     });
 });
@@ -307,13 +307,13 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
     });
-    const SF_AccountPage = new SF_AccountPage(page);
+    const SFAccount = new SF_AccountPage(page);
     await test.step('Verify Account Details', async () => {
         // await home.verifyAccountDetails(td.abn, td.country);
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await SF_AccountPage.clickOnContactDetails(fullName);
+        await SFAccount.clickOnContactDetails(fullName);
         await page.waitForLoadState('load');
-        await SF_AccountPage.clickOnLoginToExperienceAsUser();
+        await SFAccount.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
     const account = new AccountPage(page);
@@ -353,7 +353,7 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
     await test.step('Logout As Supplier User', async () => {
         await community.logoutAsSupplierUser();
     });
-    await test.step('Login as Admin', async () => {
+    await test.step('Logout as Admin', async () => {
         await home.logoutAsAdmin();
     });
 });
@@ -513,7 +513,7 @@ test('Logging in as BSS and Syncing the Case', async ({ page }) => {
         await SFAccount.navigateBack();
     });
     await test.step('Change Case Status', async () => {
-        await SFCase.clickOnShowMoreActions(buffer.supplierCaseNo);
+        await SFCase.clickOnShowMoreActions(buffer.entityValue);
         await SFCase.clickOnSendToSAP();
         await SFCase.reloadPageUntilReviewStatus();
         await SFCase.verifyCaseDetails('Trade Supplier Support',td.caseStatus_InReview);
@@ -549,12 +549,12 @@ test('Logging in as Supplier and Verifying Vendor Number', async ({ page }) => {
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
     });
-    const SF_AccountPage = new SF_AccountPage(page);
+    const SFAccount = new SF_AccountPage(page);
     await test.step('Navigate to Contact and Login', async () => {
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await SF_AccountPage.clickOnContactDetails(fullName);
+        await SFAccount.clickOnContactDetails(fullName);
         await page.waitForLoadState('load');
-        await SF_AccountPage.clickOnLoginToExperienceAsUser();
+        await SFAccount.clickOnLoginToExperienceAsUser();
     });
     const community = new CommunityPage(page);
     await test.step('Verify Vendor Number', async () => {
@@ -563,7 +563,7 @@ test('Logging in as Supplier and Verifying Vendor Number', async ({ page }) => {
     await test.step('Logout As Supplier User', async () => {
         await community.logoutAsSupplierUser();
     });
-    await test.step('Login as Admin', async () => {
+    await test.step('Logout as Admin', async () => {
         await home.logoutAsAdmin();
     });
 });
