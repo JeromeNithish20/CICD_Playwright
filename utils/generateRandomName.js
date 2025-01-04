@@ -1,4 +1,4 @@
-const fs = require('fs');
+/* const fs = require('fs');
 export function generateRandomName() {
     const firstNames = ['John', 'Jane', 'Michael', 'Emily', 'Chris', 'Sarah', 'David', 'Laura', 'James', 'Sophia'];
     const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Martinez', 'Hernandez'];
@@ -31,4 +31,16 @@ export function generateRandomName() {
     fs.writeFileSync(filePath, JSON.stringify(bufferData, null, 2), 'utf8');
 
     return randomName;
+} */
+export function generateRandomName() {
+    const firstNames = ['John', 'Jane', 'Michael', 'Emily', 'Chris', 'Sarah', 'David', 'Laura', 'James', 'Sophia'];
+    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Martinez', 'Hernandez'];
+
+    const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+
+    return {
+        firstName: randomFirstName,
+        lastName: randomLastName
+    };
 }

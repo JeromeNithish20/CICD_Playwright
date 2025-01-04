@@ -49,7 +49,7 @@ export class CommunityPage {
         await expect.soft(this.page).toHaveURL(this.pageURL);
     }
     async clickOnCases() {
-        const popupTimeout = 10000;
+        /* const popupTimeout = 10000;
         // Wait for the popup if it appears
         try {
             const isPopupVisible = await this.page.locator(this.welcomePopupClose).waitFor({
@@ -62,7 +62,7 @@ export class CommunityPage {
             }
         } catch (error) {
             console.log("Welcome Popup did not appear within the timeout. Proceeding...");
-        }
+        } */
         // Proceed to click the "Cases" button
         await this.page.locator(this.casesButton).waitFor({ state: 'visible' });
         await this.page.locator(this.casesButton).click();
@@ -77,7 +77,7 @@ export class CommunityPage {
         await this.page.click(this.allOpenCasesOption);
     }
     async clickOnRRC() {
-        const popupTimeout = 20000;
+        /* const popupTimeout = 20000;
         // Handle the popup if it appears
         try {
             const isPopupVisible = await this.page.locator(this.welcomePopupClose).waitFor({
@@ -91,7 +91,7 @@ export class CommunityPage {
             }
         } catch (error) {
             console.log("Welcome Popup did not appear within the timeout. Proceeding...");
-        }
+        } */
 
         // Proceed to click the "RRC" button
         await this.page.locator(this.quickLinksTitle).waitFor({ state: 'visible' });
@@ -120,34 +120,6 @@ export class CommunityPage {
             await this.page.click(this.allAciveRRCOption);
         }
     }
-    /* async changeRRCListView() {
-        // Define a timeout for waiting for the popup
-        const popupTimeout = 15000; // Adjust based on expected popup delay
-
-        // Handle the popup if it appears
-        try {
-            const isPopupVisible = await this.page.locator(this.exitPopup).waitFor({
-                state: 'visible',
-                timeout: popupTimeout,
-            });
-
-            if (isPopupVisible) {
-                await this.page.locator(this.exitPopup).click();
-                await this.page.locator(this.exitPopup).waitFor({ state: 'hidden' }); // Ensure popup is gone
-            }
-        } catch (error) {
-            console.log("RRC popup did not appear within the timeout. Proceeding...");
-        }
-
-        // Proceed with changing the RRC list view
-        await this.page.locator(this.RRCListViewDropdown).waitFor({ state: 'visible' });
-        await this.page.locator(this.RRCListViewDropdown).click();
-        await this.page.locator(this.searchRRCListInput).waitFor({ state: 'visible' });
-        await this.page.fill(this.searchRRCListInput, 'All Active');
-        await this.page.locator(this.allAciveRRCOption).waitFor({ state: 'visible' });
-        await this.page.locator(this.allAciveRRCOption).click();
-    } */
-
     async searchRRCList(RRC) {
         await this.page.waitForSelector(this.searchRRCInput, { state: 'visible' });
         await this.page.fill(this.searchRRCInput, RRC);
@@ -239,5 +211,10 @@ export class CommunityPage {
         await this.page.click(this.profileIcon);
         await this.page.waitForSelector(this.logoutButton, { state: 'visible' });
         await this.page.click(this.logoutButton);
+    }
+    async reloadHomePage() {
+        await this.page.waitForSelector(this.quickLinksTitle, { state: 'visible' });
+        await this.page.reload();
+        await this.page.waitForLoadState('load');
     }
 }
