@@ -5,11 +5,11 @@ export class SF_AccountPage {
         //Highlight Panel
         this.vendorNumber = "//p[@title='Vendor Number']/following-sibling::p/slot/*";
         this.businessUnit = "//p[@title='Business Organization']/following-sibling::p/slot/*";
-        this.contactDetailsTab = "(//a[text()='Contact Details'])[2]";
+        this.contactDetailsTab = "//slot//*[text()='${accountName}']/ancestor::div[contains(@class,'region-header')]/following-sibling::div//a[text()='Contact Details']";
         //Business Details
-        this.abnNzbnField = "(//span[text()='ABN/NZBN']/../../following-sibling::dd//*[@slot='output'])";
-        this.recordTypeField = "(//span[text()='Record Type']/../../following-sibling::dd//*[@slot='output'])";
-        this.targetCountryField = "(//span[text()='Target Country']/../../following-sibling::dd//*[@slot='output'])";
+        this.abnNzbnField = "//*[text()='${accountName}' and @slot='output']/ancestor::slot[@class='column']/flexipage-field[1]//*[@slot='output']";
+        this.recordTypeField = "(//*[text()='${accountName}']/ancestor::flexipage-column2/following-sibling::*//*[@slot='output'])[1]";
+        this.targetCountryField = "(//*[text()='${accountName}']/ancestor::flexipage-column2/following-sibling::*//*[@slot='output'])[4]";
         this.editSearchTerm1 = "button[title='Edit Search Term1']";
         this.searchTerm1 = "input[name='Search_Term1__c']";
         this.searchTerm2 = "input[name='Search_Term2__c']";
@@ -18,7 +18,7 @@ export class SF_AccountPage {
         this.tadingTerm_Input = "input[placeholder='Search Trading Terms...']";
         this.tradingTerm_Value = "[title='$tradeTerm']";
         this.tradingTermTab = "//a[text()='Trading Terms']";
-        this.tradingTermName = "//slot[text()='${tradingTermName}']";
+        this.tradingTermName = "//span[text()='${tradingTermName}']";
         this.editRefVendor_btn = "//button[@title='Edit Reference Vendor']";
         this.refVendorDropdown = "//label[text()='Reference Vendor']/following-sibling::div//button";
         this.refVendorDropdownOption = "span[title='${refVendor}']";
@@ -28,18 +28,24 @@ export class SF_AccountPage {
         this.paymentTermsCodeOption = "span[title='${paymentTermsCode}']";
         this.saveButton = "//button[@name='SaveEdit']";
     }
-    async verifyAccountDetails(exp_abn, exp_country) {
-        await this.page.locator(this.abnNzbnField).waitFor({ state: 'visible' });
-        const act_abnNzbn = await this.page.locator(this.abnNzbnField).innerText();
+    async verifyAccountDetails(accountName, exp_abn, exp_country) {
+        const abnNzbnField = this.abnNzbnField.replace('${accountName}', accountName);
+        await this.page.locator(abnNzbnField).waitFor({ state: 'visible' });
+        const act_abnNzbn = await this.page.locator(abnNzbnField).innerText();
         expect(act_abnNzbn).toContain(exp_abn);
-        const act_recordType = await this.page.locator(this.recordTypeField).innerText();
+        const recordTypeField = this.recordTypeField.replace('${accountName}', accountName);
+        const act_recordType = await this.page.locator(recordTypeField).innerText();
         expect(act_recordType).toContain('Supplier');
-        const act_targetCountry = await this.page.locator(this.targetCountryField).innerText();
+        const targetCountryField = this.targetCountryField.replace('${accountName}', accountName);
+        const act_targetCountry = await this.page.locator(targetCountryField).innerText();
         expect(act_targetCountry).toContain(exp_country);
     }
-    async clickOnContactDetails(fullName) {
-        await this.page.getByRole('tab', { name: 'Contact Details' }).waitFor({ state: 'visible' });
-        await this.page.getByRole('tab', { name: 'Contact Details' }).click();
+    async clickOnContactDetails(accountName, fullName) {
+        const contactDetailsTab = this.contactDetailsTab.replace('${accountName}', accountName);
+        await this.page.locator(contactDetailsTab).waitFor({ state: 'visible' });
+        await this.page.locator(contactDetailsTab).click();
+        // await this.page.getByRole('tab', { name: 'Contact Details' }).waitFor({ state: 'visible' });
+        // await this.page.getByRole('tab', { name: 'Contact Details' }).click();
         await this.page.getByRole('cell', { name: fullName }).waitFor({ state: 'visible' });
         await this.page.getByRole('cell', { name: fullName }).click();
     }

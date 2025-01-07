@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 export class SF_CasesPage {
     constructor(page) {
         this.page = page;
-        this.accountNameLink = "//span[@class='slds-truncate']/slot[text()='${accountName}']";
+        this.accountNameLink = "//span[@class='slds-truncate']//span[text()='${accountName}']";
         this.caseOwner = "//p[@title='Case Owner']/following-sibling::p/slot";
         this.editCaseStatus_btn = "(//slot/*[text()='$caseNo']/ancestor::dl)[2]//button[@title='Edit Status']";
         this.caseStatus = "//p[@title='Status']/following-sibling::p/slot";
@@ -14,8 +14,8 @@ export class SF_CasesPage {
         this.caseOwner_type = "//label[text()='Case Owner']/following-sibling::div//button/span";
         this.caseOwner_User = "//span[@title='User']";
         this.caseOwner_Input = "//label[text()='Case Owner']/following-sibling::div//input";
-        this.caseOwnerDropdownValue = "(//span//*[@title='${user}'])[1]";
-        this.showMoreActions = "//slot[text()='${accountName}']/ancestor::div[@class='secondaryFields']/preceding-sibling::div//*[contains(text(),'Show')]/parent::button";
+        this.caseOwnerDropdownValue = "(//ul//li//span/*[@title='${user}'])[1]";
+        this.showMoreActions = "//span[text()='${accountName}']/ancestor::div[@class='secondaryFields']/preceding-sibling::div//*[contains(text(),'Show')]/parent::button";
         this.sendToSAP = "//*[@title='Send to SAP']//a";
     }
     async clickOnEditCaseStatus(caseNo) {

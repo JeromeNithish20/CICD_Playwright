@@ -97,12 +97,12 @@ test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
         await home.searchAccount(buffer.entityValue);
         await home.clickOnAccountResultTab();
         await home.clickOnAccount(buffer.entityValue);
-        await SFAccount.verifyAccountDetails(td.abn, td.country);
+        await SFAccount.verifyAccountDetails(buffer.entityValue, td.abn, td.country);
     });
     await test.step('Login as Supplier', async () => {
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        console.log(`${buffer.firstName} ${buffer.lastName}`);
-        await SFAccount.clickOnContactDetails(fullName);
+        // console.log(`${buffer.firstName} ${buffer.lastName}`);
+        await SFAccount.clickOnContactDetails(buffer.entityValue, fullName);
         await page.waitForLoadState('load');
         await SFAccount.clickOnLoginToExperienceAsUser();
     });
@@ -319,7 +319,7 @@ test('Logging as Supplier and Enriching Supplier Case', async ({ page }) => {
     await test.step('Verify Account Details', async () => {
         // await home.verifyAccountDetails(td.abn, td.country);
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await SFAccount.clickOnContactDetails(fullName);
+        await SFAccount.clickOnContactDetails(buffer.entityValue, fullName);
         await page.waitForLoadState('load');
         await SFAccount.clickOnLoginToExperienceAsUser();
     });
@@ -561,7 +561,7 @@ test('Logging in as Supplier and Verifying Vendor Number', async ({ page }) => {
     const SFAccount = new SF_AccountPage(page);
     await test.step('Navigate to Contact and Login', async () => {
         const fullName = `${buffer.firstName} ${buffer.lastName}`;
-        await SFAccount.clickOnContactDetails(fullName);
+        await SFAccount.clickOnContactDetails(buffer.entityValue, fullName);
         await page.waitForLoadState('load');
         await SFAccount.clickOnLoginToExperienceAsUser();
     });

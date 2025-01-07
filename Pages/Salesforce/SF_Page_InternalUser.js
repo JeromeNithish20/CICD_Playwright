@@ -10,7 +10,7 @@ export class SF_Page_InternalUser {
         //Gloabl Search
         this.globalSearch = 'button[aria-label="Search"]';
         this.globalSearchBox = 'Search...';
-        this.caseResultTab = "//a//span[text()='Cases']";
+        this.caseResultTab = "//a//span[contains(@class, 'scopesItem_name') and text()='Cases']";
         //Case Details
         this.keyFields = "h2[class='title']";
         this.showMore_btn = "//button[@title='Show More']";
