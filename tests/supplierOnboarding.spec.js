@@ -131,6 +131,7 @@ test('Logging in as Supplier and Initiating a New RRC', async ({ page }) => {
             await rrc.selectArticleCategory(td.articleCategory);
             await rrc.selectIsForHumanConsumption(td.isHumanForConsumption);
             await rrc.selectDataSource(td.isThirdParty);
+            await rrc.selectMPDDataSource(td.MPD_DataSource);
             await rrc.clickOnNext();
         });
         await page1.waitForTimeout(4000);

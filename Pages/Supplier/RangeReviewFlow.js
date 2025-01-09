@@ -85,6 +85,10 @@ export class RangeReviewFlow {
         await this.page.waitForSelector(this.DataSource_Y_N, { state: 'visible' });
         await this.page.selectOption(this.DataSource_Y_N, { value: yes_no });
     }
+    async selectMPDDataSource(MPD_DataSource) {
+        await this.page.waitForSelector(this.MPD_DataSource, { state: 'visible' });
+        await this.page.selectOption(this.MPD_DataSource, { value: MPD_DataSource });
+    }
     async clickOnNext() {
         await this.page.waitForSelector(this.nextButton, { state: 'visible' });
         await this.page.locator(this.nextButton).scrollIntoViewIfNeeded();
